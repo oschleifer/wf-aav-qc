@@ -118,7 +118,7 @@ def plot_contamination(report, class_counts):
         with Grid(columns=2):
             df_reads = pd.DataFrame()
             for sample, df_sample in df_class_counts.groupby('sample_id'):
-                df_reads = pd.concat([df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])],df_reads])
+                df_reads = pd.concat([df_reads, df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
             df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
             plt = ezc.barplot(
                 df_reads[[sample, 'Percentage of Reads']]
