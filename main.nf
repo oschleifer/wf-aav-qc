@@ -461,8 +461,11 @@ workflow pipeline {
         ref_rep_cap
         ref_transgene_plasmid
     main:
+        // per_read_stats = samples.flatMap {
+        //     it[2] ? file(it[2].resolve('*read*.tsv.gz')) : null
+        // }
         per_read_stats = samples.flatMap {
-            it[2] ? file(it[2].resolve('*read*.tsv.gz')) : null
+            it ? file(it.resolve('read_stats.tsv.gz')) : null
         }
 
         get_ref_names(ref_transgene_plasmid)
