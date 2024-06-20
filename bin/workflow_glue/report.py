@@ -123,6 +123,7 @@ def plot_contamination(report, class_counts):
                 df_alns = pd.concat([df_alns, df_sample[~df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
                 # plt = ezc.barplot(data=df_reads,x='Reference', y='Percentage of Reads', hue=sample)
             df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
+            p(df_reads)
             plt = ezc.barplot(
                 df_reads[['Reference', 'Percentage of Reads']], hue='sample_id')
             plt.title = dict(text='Reads mapped/unmapped')
