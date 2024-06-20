@@ -140,6 +140,25 @@ def plot_contamination(report, class_counts):
             plt.title = dict(text='Alignment counts per target')
             EZChart(plt, theme='epi2melabs', height='400px')
 
+def plot_read_summary(report, stats):
+    """Make report section barplots detailing the read quality, read length, and base yield."""
+    df = pd.read_csv(
+        stats,
+        sep='\t',
+        dtype={
+            'read_id': str,
+            'filename': str,
+            'sample_name': str,
+            'read_length':np.uint32,
+            'mean_quality': np.float32,
+            'channel': np.uint32,
+            'read_number': np.uint32
+        })
+    with report.add_section("Read Summary", "Reads"):
+        p(
+            "Read quality, read length, base yield"
+        )
+
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
     df = pd.read_csv(
@@ -202,7 +221,7 @@ def main(args):
 
     if args.stats:
         with report.add_section("Read summary", "Read summary"):
-            p(args.stats[0])
+            p(args.stats)
             # TODO fix this. Do we need o concat stats?
             fastcat.SeqSummary(args.stats[0])
 
