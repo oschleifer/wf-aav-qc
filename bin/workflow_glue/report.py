@@ -158,6 +158,15 @@ def plot_read_summary(report, stats):
         p(
             "Read quality, read length, base yield"
         )
+        with Grid(columns=3):
+            for sample, df_sample in df.groupby('sample_name'):
+                df_read_lengths = df_sample.sort_values('read_length', ascending=True)
+                plt = ezc.barplot(
+                    df_read_lengths,
+                    x='read_length'
+                )
+                plt.title = dict(text='Read lengths')
+                EZChart(plt, theme='epi2melabs')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
