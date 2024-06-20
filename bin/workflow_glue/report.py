@@ -116,22 +116,30 @@ def plot_contamination(report, class_counts):
         )
 
         with Grid(columns=2):
-            df_reads = pd.DataFrame()
-            df_alns = pd.DataFrame()
+            plt = ezc.barplot()
             for sample, df_sample in df_class_counts.groupby('sample_id'):
-                df_reads = pd.concat([df_reads, df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
-                df_alns = pd.concat([df_alns, df_sample[~df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
-                # plt = ezc.barplot(data=df_reads,x='Reference', y='Percentage of Reads', hue=sample)
-            df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
-            plt = ezc.barplot(
-                df_reads[['Reference', 'Percentage of Reads']], hue='sample_id')
+                df_reads = df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]
+                plt.add_dataset(df_reads[['Reference', 'Percentage of Reads']])
             plt.title = dict(text='Reads mapped/unmapped')
             EZChart(plt, theme='epi2melabs', height='400px')
 
-            plt = ezc.barplot(
-                df_alns[['Reference', 'Percentage of alignments']], hue='sample_id')
-            plt.title = dict(text='Alignment counts per target')
-            EZChart(plt, theme='epi2melabs', height='400px')
+        # with Grid(columns=2):
+        #     df_reads = pd.DataFrame()
+        #     df_alns = pd.DataFrame()
+        #     for sample, df_sample in df_class_counts.groupby('sample_id'):
+        #         df_reads = pd.concat([df_reads, df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
+        #         df_alns = pd.concat([df_alns, df_sample[~df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
+        #         # plt = ezc.barplot(data=df_reads,x='Reference', y='Percentage of Reads', hue=sample)
+        #     df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
+        #     plt = ezc.barplot(
+        #         df_reads[['Reference', 'Percentage of Reads']], hue='sample_id')
+        #     plt.title = dict(text='Reads mapped/unmapped')
+        #     EZChart(plt, theme='epi2melabs', height='400px')
+
+        #     plt = ezc.barplot(
+        #         df_alns[['Reference', 'Percentage of alignments']], hue='sample_id')
+        #     plt.title = dict(text='Alignment counts per target')
+        #     EZChart(plt, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
