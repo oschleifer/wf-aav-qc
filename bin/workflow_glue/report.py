@@ -164,7 +164,7 @@ def plot_read_summary(report, stats):
             for sample, df_sample in df.groupby('sample_name'):
                 df_read_lengths = df_sample.sort_values('read_length', ascending=True)
                 plt.dataset(
-                    df_read_lengths
+                    df_read_lengths[['Read Length','Number of Reads']]
                 )
             plt.series = [dict(type-'line')]
             plt.title = dict(text='Read lengths')
