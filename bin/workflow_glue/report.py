@@ -229,7 +229,7 @@ def main(args):
         ], key=lambda d: d["sample"])
 
     if args.stats:
-        plot_read_summary(report, args.stats)
+        plot_read_summary(report, args.stats[0])
         # with report.add_section("Read summary", "Read summary"):
         #     # TODO fix this. Do we need o concat stats?
         #     fastcat.SeqSummary(args.stats[0])
