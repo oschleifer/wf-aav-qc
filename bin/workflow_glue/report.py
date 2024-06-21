@@ -164,9 +164,9 @@ def plot_read_summary(report, stats):
             for sample, df_sample in df.groupby('sample_name'):
                 df_read_lengths = df_sample.sort_values('read_length', ascending=True)
                 plt.dataset(
-                    df_read_lengths[['Read Length','Number of Reads']]
+                    df_read_lengths[['read_length']]
                 )
-            plt.series = [dict(type-'line')]
+            plt.series = [dict(type='bar')]
             plt.title = dict(text='Read lengths')
             EZChart(plt, theme='epi2melabs', height='400px')
 
