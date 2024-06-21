@@ -403,7 +403,7 @@ process makeReport {
     memory '4 GB'
     input:
         val metadata
-        path 'per_read_stats.tsv'
+        path 'stats.tsv'
         path 'truncations.tsv'
         path 'itr_coverage.tsv'
         path 'contam_class_counts.tsv'
@@ -419,7 +419,7 @@ process makeReport {
     echo '${metadata}' > metadata.json
     workflow-glue report $report_name \
         --versions versions \
-        --stats per_read_stats.tsv \
+        --stats stats.tsv \
         --params params.json \
         --metadata metadata.json \
         --truncations truncations.tsv \
