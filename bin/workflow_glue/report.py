@@ -3,6 +3,7 @@ import json
 
 from dominate.tags import p
 import ezcharts as ezc
+from ezcharts.plots import Plot
 from ezcharts.components import fastcat
 from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
@@ -159,7 +160,7 @@ def plot_read_summary(report, stats):
             "Read quality, read length, base yield"
         )
         with Grid(columns=3):
-            plt = ezc.Plot()
+            plt = Plot()
             for sample, df_sample in df.groupby('sample_name'):
                 df_read_lengths = df_sample.sort_values('read_length', ascending=True)
                 plt.add_dataset(
