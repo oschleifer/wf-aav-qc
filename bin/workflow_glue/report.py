@@ -138,8 +138,7 @@ def plot_contamination(report, class_counts):
             plt = ezc.barplot(
                 df_alns[['Reference', 'Percentage of alignments']], hue='sample_id')
             plt.title = dict(text='Alignment counts per target')
-            p(plt)
-            # EZChart(plt, theme='epi2melabs', height='400px')
+            EZChart(plt, theme='epi2melabs', height='400px')
 
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
@@ -167,7 +166,8 @@ def plot_read_summary(report, stats):
                     x='read_length'
                 )
             plt.title = dict(text='Read lengths')
-            EZChart(plt, theme='epi2melabs', height='400px')
+            p(plt)
+            # EZChart(plt, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
