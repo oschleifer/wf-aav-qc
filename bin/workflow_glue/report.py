@@ -159,7 +159,7 @@ def plot_read_summary(report, stats):
             "Read quality, read length, base yield"
         )
         with Grid(columns=3):
-            plt = ezc.barplot(x='read_length', y='number of reads')
+            plt = ezc.barplot([0,0],x='read_length', y='number of reads')
             for sample, df_sample in df.groupby('sample_name'):
                 df_read_lengths = df_sample.sort_values('read_length', ascending=True)
                 plt.add_dataset(
