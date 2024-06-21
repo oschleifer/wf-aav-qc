@@ -230,7 +230,6 @@ def main(args):
 
     if args.stats:
         with report.add_section("Read summary", "Read summary"):
-            p(args.stats)
             # TODO fix this. Do we need o concat stats?
             fastcat.SeqSummary(args.stats[0])
 
