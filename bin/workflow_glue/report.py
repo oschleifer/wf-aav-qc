@@ -166,7 +166,7 @@ def plot_read_summary(report, stats):
                     x='read_length'
                 )
             plt.title = dict(text='Read lengths')
-            p(plt)
+            p(plt[0])
             # EZChart(plt, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
