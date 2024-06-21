@@ -160,7 +160,7 @@ def plot_read_summary(report, stats):
             "Read quality, read length, base yield"
         )
         with Grid(columns=3):
-            plt = ezc.histogram(
+            plt = ezc.barplot(
                 df[['read_length']]
             )
             plt.title = dict(text='Read lengths')
