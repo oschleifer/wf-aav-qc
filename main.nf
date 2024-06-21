@@ -403,7 +403,7 @@ process makeReport {
     memory '4 GB'
     input:
         val metadata
-        path 'stats.tsv'
+        path 'per_read_stats.tsv'
         path 'truncations.tsv'
         path 'itr_coverage.tsv'
         path 'contam_class_counts.tsv'
@@ -419,7 +419,7 @@ process makeReport {
     echo '${metadata}' > metadata.json
     workflow-glue report $report_name \
         --versions versions \
-        --stats stats.tsv \
+        --stats per_read_stats.tsv \
         --params params.json \
         --metadata metadata.json \
         --truncations truncations.tsv \
@@ -462,7 +462,7 @@ workflow pipeline {
         ref_transgene_plasmid
     main:
         per_read_stats = samples.flatMap {
-            it ? file(it[2].resolve('*read*.tsv.gz')) : null
+            it[2] ? file(it[2].resolve('*read*.tsv.gz')) : null
         }
 
         get_ref_names(ref_transgene_plasmid)
