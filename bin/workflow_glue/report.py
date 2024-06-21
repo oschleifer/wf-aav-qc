@@ -165,8 +165,8 @@ def plot_read_summary(report, stats):
                     df_read_lengths,
                     x='read_length'
                 )
-                plt.title = dict(text='Read lengths')
-                EZChart(plt, theme='epi2melabs')
+            plt.title = dict(text='Read lengths')
+            EZChart(plt, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
