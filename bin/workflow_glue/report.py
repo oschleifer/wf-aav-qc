@@ -12,6 +12,10 @@ from ezcharts.layout.snippets.table import DataTable
 from bokeh.layouts import column
 from bokeh.plotting import figure, show
 from bokeh.palettes import Category20c
+from bokeh.embed import file_html
+from bokeh.resources import CDN
+import matplotlib.pyplot as plt
+import mplcairo
 import numpy as np
 import pandas as pd
 
@@ -155,8 +159,15 @@ def plot_contamination(report, class_counts):
                 bokeh_p1.append(column(p1))
                 bokeh_p2.append(column(p2))
 
-            show(column(bokeh_p1))
-            show(column(bokeh_p2))
+            html_p1 = file_html(bokeh_p1, CDN)
+            html_p2 = file_html(bokeh_p2, CDN)
+
+            fig, ax = plt.subplots(2, 1, figsize=(10,14))
+
+            for axes in ax:
+                axes.axis("off")
+            
+            ax[0].imshow(mplcairo.show(fig,width=800, height=800))
 
         # with Grid(columns=2):
         #     df_reads = pd.DataFrame()
