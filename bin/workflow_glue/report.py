@@ -9,6 +9,9 @@ from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
 from ezcharts.layout.snippets.table import DataTable
+from bokeh.layouts import column
+from bokeh.plotting import figure, show
+from bokeh.palettes import Category20c
 import numpy as np
 import pandas as pd
 
@@ -123,23 +126,52 @@ def plot_contamination(report, class_counts):
         #         plt.add_dataset(df_reads[['Reference', 'Percentage of Reads']])
         #     plt.title = dict(text='Reads mapped/unmapped')
         #     EZChart(plt, theme='epi2melabs', height='400px')
+        plots = []
 
-        with Grid(columns=2):
-            df_reads = pd.DataFrame()
-            df_alns = pd.DataFrame()
-            for sample, df_sample in df_class_counts.groupby('sample_id'):
-                df_reads = pd.concat([df_reads, df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
-                df_alns = pd.concat([df_alns, df_sample[~df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
-            df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
-            plt = ezc.barplot(
-                df_reads[['Reference', 'Percentage of Reads']], hue='sample_id')
-            plt.title = dict(text='Reads mapped/unmapped')
-            EZChart(plt, theme='epi2melabs', height='400px')
+        for sample, df_sample in df_class_counts.groupby('sample_id'):
+            p1 = figure(x_range=df_sample['Reference'].unique(), plot_height=400, title=f'Reads mapped/unmapped - {sample}')
+            p2 = figure(x_range=df_sample['Reference'].unique(), plot_height=400, title=f'Alignment counts per target - {sample}')
 
-            plt = ezc.barplot(
-                df_alns[['Reference', 'Percentage of alignments']], hue='sample_id')
-            plt.title = dict(text='Alignment counts per target')
-            EZChart(plt, theme='epi2melabs', height='400px')
+            colors = Category20c[len(df_sample['Reference'].unique())]
+
+            for i, ref in enumerate(['Mapped', 'Unmapped']):
+                df_plot = df_sample[df_sample['Reference'] == ref]
+                p1.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i], legend_label=ref)
+
+            for i, ref in enumerate(df_sample['Reference'].unique()):
+                if ref not in ['Mapped', 'Unmapped']:
+                    df_plot = df_sample[df_sample['Reference'] == ref]
+                    p2.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i+2], legend_label=ref)
+
+            p1.xgrid.grid_line_color = None
+            p1.y_range.start = 0
+            p1.y_range.end = df_sample['Percentage of alignments'].max() + 10
+            p1.legend.title = 'Reference'
+            p1.legend.location = 'top_right'
+            p1.legend.click_policy = 'hide'
+
+            plots.append([p1, p2])
+
+        EZChart(plots)
+
+        # show(column(plots))
+
+        # with Grid(columns=2):
+        #     df_reads = pd.DataFrame()
+        #     df_alns = pd.DataFrame()
+        #     for sample, df_sample in df_class_counts.groupby('sample_id'):
+        #         df_reads = pd.concat([df_reads, df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
+        #         df_alns = pd.concat([df_alns, df_sample[~df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
+        #     df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
+        #     plt = ezc.barplot(
+        #         df_reads[['Reference', 'Percentage of Reads']], hue='sample_id')
+        #     plt.title = dict(text='Reads mapped/unmapped')
+        #     EZChart(plt, theme='epi2melabs', height='400px')
+
+        #     plt = ezc.barplot(
+        #         df_alns[['Reference', 'Percentage of alignments']], hue='sample_id')
+        #     plt.title = dict(text='Alignment counts per target')
+        #     EZChart(plt, theme='epi2melabs', height='400px')
 
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
