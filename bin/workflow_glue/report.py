@@ -150,7 +150,7 @@ def plot_contamination(report, class_counts):
             p1.legend.location = 'top_right'
             p1.legend.click_policy = 'hide'
 
-            plots.append([p1, p2])
+            plots.append(column(p1,p2))
 
         show(column(plots))
 
