@@ -191,12 +191,12 @@ def plot_read_summary(report, stats):
         p(
             "Read quality, read length, base yield"
         )
-        with Grid(columns=3):
-            plt = ezc.barplot(
-                df[['read_length']]
-            )
-            plt.title = dict(text='Read lengths')
-            EZChart(plt,  theme='epi2melabs', height='400px')
+        # with Grid(columns=3):
+        #     plt = ezc.barplot(
+        #         df[['read_length']]
+        #     )
+        #     plt.title = dict(text='Read lengths')
+        #     EZChart(plt,  theme='epi2melabs', height='400px')
             # plt = Plot()
             # for sample, df_sample in df.groupby('sample_name'):
             #     df_read_lengths = df_sample.sort_values('read_length', ascending=True)
