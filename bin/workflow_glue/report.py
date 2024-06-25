@@ -126,7 +126,8 @@ def plot_contamination(report, class_counts):
         #         plt.add_dataset(df_reads[['Reference', 'Percentage of Reads']])
         #     plt.title = dict(text='Reads mapped/unmapped')
         #     EZChart(plt, theme='epi2melabs', height='400px')
-        plots = []
+        bokeh_p1 = []
+        bokeh_p2 = []
 
         for sample, df_sample in df_class_counts.groupby('sample_id'):
             p1 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Reads mapped/unmapped - {sample}')
@@ -150,9 +151,11 @@ def plot_contamination(report, class_counts):
             p1.legend.location = 'top_right'
             p1.legend.click_policy = 'hide'
 
-            plots.append(column(p1,p2))
+            bokeh_p1.append(column(p1))
+            bokeh_p2.append(column(p2))
 
-        show(column(plots))
+        show(column(bokeh_p1))
+        show(column(bokeh_p2))
 
         # with Grid(columns=2):
         #     df_reads = pd.DataFrame()
