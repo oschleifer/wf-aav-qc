@@ -129,33 +129,34 @@ def plot_contamination(report, class_counts):
         bokeh_p1 = []
         bokeh_p2 = []
 
-        for sample, df_sample in df_class_counts.groupby('sample_id'):
-            p1 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Reads mapped/unmapped - {sample}')
-            p2 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Alignment counts per target - {sample}')
+        with Grid(columns=2):
+            for sample, df_sample in df_class_counts.groupby('sample_id'):
+                p1 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Reads mapped/unmapped - {sample}')
+                p2 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Alignment counts per target - {sample}')
 
-            colors = Category20c[len(df_sample['Reference'].unique())]
+                colors = Category20c[len(df_sample['Reference'].unique())]
 
-            for i, ref in enumerate(['Mapped', 'Unmapped']):
-                df_plot = df_sample[df_sample['Reference'] == ref]
-                p1.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i], legend_label=ref)
-
-            for i, ref in enumerate(df_sample['Reference'].unique()):
-                if ref not in ['Mapped', 'Unmapped']:
+                for i, ref in enumerate(['Mapped', 'Unmapped']):
                     df_plot = df_sample[df_sample['Reference'] == ref]
-                    p2.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i+2], legend_label=ref)
+                    p1.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i], legend_label=ref)
 
-            p1.xgrid.grid_line_color = None
-            p1.y_range.start = 0
-            p1.y_range.end = df_sample['Percentage of alignments'].max() + 10
-            p1.legend.title = 'Reference'
-            p1.legend.location = 'top_right'
-            p1.legend.click_policy = 'hide'
+                for i, ref in enumerate(df_sample['Reference'].unique()):
+                    if ref not in ['Mapped', 'Unmapped']:
+                        df_plot = df_sample[df_sample['Reference'] == ref]
+                        p2.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i+2], legend_label=ref)
 
-            bokeh_p1.append(column(p1))
-            bokeh_p2.append(column(p2))
+                p1.xgrid.grid_line_color = None
+                p1.y_range.start = 0
+                p1.y_range.end = df_sample['Percentage of alignments'].max() + 10
+                p1.legend.title = 'Reference'
+                p1.legend.location = 'top_right'
+                p1.legend.click_policy = 'hide'
 
-        show(column(bokeh_p1))
-        show(column(bokeh_p2))
+                bokeh_p1.append(column(p1))
+                bokeh_p2.append(column(p2))
+
+            show(column(bokeh_p1))
+            show(column(bokeh_p2))
 
         # with Grid(columns=2):
         #     df_reads = pd.DataFrame()
