@@ -152,9 +152,7 @@ def plot_contamination(report, class_counts):
 
             plots.append([p1, p2])
 
-        EZChart(plots, theme='epi2melabs', height='400px')
-
-        # show(column(plots))
+        show(column(plots))
 
         # with Grid(columns=2):
         #     df_reads = pd.DataFrame()
