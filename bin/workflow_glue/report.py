@@ -129,8 +129,8 @@ def plot_contamination(report, class_counts):
         plots = []
 
         for sample, df_sample in df_class_counts.groupby('sample_id'):
-            p1 = figure(x_range=df_sample['Reference'].unique(), plot_height=400, title=f'Reads mapped/unmapped - {sample}')
-            p2 = figure(x_range=df_sample['Reference'].unique(), plot_height=400, title=f'Alignment counts per target - {sample}')
+            p1 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Reads mapped/unmapped - {sample}')
+            p2 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Alignment counts per target - {sample}')
 
             colors = Category20c[len(df_sample['Reference'].unique())]
 
