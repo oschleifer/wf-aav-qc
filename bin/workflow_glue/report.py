@@ -152,7 +152,7 @@ def plot_contamination(report, class_counts):
 
             plots.append([p1, p2])
 
-        EZChart(plots)
+        EZChart(plots, theme='epi2melabs', height='400px')
 
         # show(column(plots))
 
