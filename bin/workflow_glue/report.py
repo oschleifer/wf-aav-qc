@@ -9,11 +9,6 @@ from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
 from ezcharts.layout.snippets.table import DataTable
-from bokeh.layouts import gridplot
-from bokeh.models import ColumnDataSource, FactorRange
-from bokeh.plotting import figure, show
-from bokeh.embed import file_html
-from bokeh.resources import CDN
 import numpy as np
 import pandas as pd
 
@@ -128,14 +123,18 @@ def plot_contamination(report, class_counts):
 
             df_alns = df_class_counts[~df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
 
+            # Sort the DataFrame by 'Reference' to have 'Unmapped' first and then 'Mapped'
+            df_reads['Reference'] = pd.Categorical(df_reads['Reference'], categories=['Unmapped', 'Mapped'], ordered=True)
+            df_reads = df_reads.sort_values(by='Reference')
+
             # Create the first plot: Reads mapped/unmapped
-            df_reads['Sample_Reference'] = df_reads['sample_id'] + '_' + df_reads['Reference']
             plt_reads = ezc.barplot(
                 df_reads[['Sample_Reference', 'Percentage of Reads']],
-                x='Sample_Reference', y='Percentage of Reads',
-                color='Reference'
+                x='Reference', y='Percentage of Reads',
+                color='Reference', group='Reference'
             )
             plt_reads.title = dict(text='Reads mapped/unmapped')
+            plt_reads.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_reads, theme='epi2melabs', height='400px')
 
             # Create the second plot: Alignment counts per target
@@ -146,6 +145,7 @@ def plot_contamination(report, class_counts):
                 color='Reference'
             )
             plt_alns.title = dict(text='Alignment counts per target')
+            plt_alns.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_alns, theme='epi2melabs', height='400px')
 
 def plot_read_summary(report, stats):
