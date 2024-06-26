@@ -9,8 +9,8 @@ from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
 from ezcharts.layout.snippets.table import DataTable
-from bokeh.layouts import column
-from bokeh.plotting import figure, show
+from bokeh.layouts import gridplot, column
+from bokeh.plotting import figure, show, output_file
 from bokeh.palettes import Category20c
 from bokeh.embed import file_html
 from bokeh.resources import CDN
@@ -159,8 +159,8 @@ def plot_contamination(report, class_counts):
                 bokeh_p1.append(column(p1))
                 bokeh_p2.append(column(p2))
 
-            html_p1 = file_html(bokeh_p1, CDN)
-            html_p2 = file_html(bokeh_p2, CDN)
+            # html_p1 = file_html(bokeh_p1, CDN)
+            # html_p2 = file_html(bokeh_p2, CDN)
 
             fig, ax = plt.subplots(2, 1, figsize=(10,14))
 
@@ -168,6 +168,9 @@ def plot_contamination(report, class_counts):
                 axes.axis("off")
             
             ax[0].imshow(mplcairo.show(fig,width=800, height=800))
+
+            output_file("plots.html")
+            show(gridplot([bokeh_p1, bokeh_p2], ncols=2))
 
         # with Grid(columns=2):
         #     df_reads = pd.DataFrame()
