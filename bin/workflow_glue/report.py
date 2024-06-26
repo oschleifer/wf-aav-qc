@@ -9,13 +9,11 @@ from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
 from ezcharts.layout.snippets.table import DataTable
-from bokeh.layouts import gridplot, column
-from bokeh.plotting import figure, show, output_file
-from bokeh.palettes import Category20c
+from bokeh.layouts import gridplot
+from bokeh.models import ColumnDataSource, FactorRange
+from bokeh.plotting import figure, show
 from bokeh.embed import file_html
 from bokeh.resources import CDN
-import matplotlib.pyplot as plt
-import mplcairo
 import numpy as np
 import pandas as pd
 
@@ -123,71 +121,52 @@ def plot_contamination(report, class_counts):
             "plasmid)."
         )
 
-        # with Grid(columns=2):
-        #     plt = ezc.barplot()
-        #     for sample, df_sample in df_class_counts.groupby('sample_id'):
-        #         df_reads = df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]
-        #         plt.add_dataset(df_reads[['Reference', 'Percentage of Reads']])
-        #     plt.title = dict(text='Reads mapped/unmapped')
-        #     EZChart(plt, theme='epi2melabs', height='400px')
-        bokeh_p1 = []
-        bokeh_p2 = []
+        # Prepare data for combined plots
+        df_reads = df_class_counts[df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
+        df_reads['Percentage of Reads'] = df_reads['Percentage of alignments']
 
-        with Grid(columns=2):
-            for sample, df_sample in df_class_counts.groupby('sample_id'):
-                p1 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Reads mapped/unmapped - {sample}')
-                p2 = figure(x_range=df_sample['Reference'].unique(), height=400, title=f'Alignment counts per target - {sample}')
+        df_alns = df_class_counts[~df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
 
-                colors = Category20c[len(df_sample['Reference'].unique())]
+        # Create the first plot: Reads mapped/unmapped
+        source_reads = ColumnDataSource(data=dict(
+            x=[(sample, reference) for sample in df_reads['sample_id'].unique() for reference in ['Mapped', 'Unmapped']],
+            counts=[df_reads[(df_reads['sample_id'] == sample) & (df_reads['Reference'] == reference)]['Percentage of Reads'].values[0] 
+                    if not df_reads[(df_reads['sample_id'] == sample) & (df_reads['Reference'] == reference)].empty else 0
+                    for sample in df_reads['sample_id'].unique() for reference in ['Mapped', 'Unmapped']]
+        ))
 
-                for i, ref in enumerate(['Mapped', 'Unmapped']):
-                    df_plot = df_sample[df_sample['Reference'] == ref]
-                    p1.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i], legend_label=ref)
+        p1 = figure(x_range=FactorRange(*source_reads.data['x']), height=400, title="Reads mapped/unmapped",
+                    toolbar_location=None, tools="")
 
-                for i, ref in enumerate(df_sample['Reference'].unique()):
-                    if ref not in ['Mapped', 'Unmapped']:
-                        df_plot = df_sample[df_sample['Reference'] == ref]
-                        p2.vbar(x=ref, top=df_plot['Percentage of alignments'], width=.9, color=colors[i+2], legend_label=ref)
+        p1.vbar(x='x', top='counts', width=0.9, source=source_reads)
 
-                p1.xgrid.grid_line_color = None
-                p1.y_range.start = 0
-                p1.y_range.end = df_sample['Percentage of alignments'].max() + 10
-                p1.legend.title = 'Reference'
-                p1.legend.location = 'top_right'
-                p1.legend.click_policy = 'hide'
+        p1.xgrid.grid_line_color = None
+        p1.y_range.start = 0
 
-                bokeh_p1.append(column(p1))
-                bokeh_p2.append(column(p2))
+        # Create the second plot: Alignment counts per target
+        unique_references = df_alns['Reference'].unique()
+        source_alns = ColumnDataSource(data=dict(
+            x=[(sample, reference) for sample in df_alns['sample_id'].unique() for reference in unique_references],
+            counts=[df_alns[(df_alns['sample_id'] == sample) & (df_alns['Reference'] == reference)]['Percentage of alignments'].values[0] 
+                    if not df_alns[(df_alns['sample_id'] == sample) & (df_alns['Reference'] == reference)].empty else 0
+                    for sample in df_alns['sample_id'].unique() for reference in unique_references]
+        ))
 
-            # html_p1 = file_html(bokeh_p1, CDN)
-            # html_p2 = file_html(bokeh_p2, CDN)
+        p2 = figure(x_range=FactorRange(*source_alns.data['x']), height=400, title="Alignment counts per target",
+                    toolbar_location=None, tools="")
 
-            fig, ax = plt.subplots(2, 1, figsize=(10,14))
+        p2.vbar(x='x', top='counts', width=0.9, source=source_alns)
 
-            for axes in ax:
-                axes.axis("off")
-            
-            ax[0].imshow(mplcairo.show(fig,width=800, height=800))
+        p2.xgrid.grid_line_color = None
+        p2.y_range.start = 0
 
-            output_file("plots.html")
-            show(gridplot([bokeh_p1, bokeh_p2], ncols=2))
+        # Combine the plots into a grid
+        grid = gridplot([[p1, p2]], sizing_mode='stretch_both')
 
-        # with Grid(columns=2):
-        #     df_reads = pd.DataFrame()
-        #     df_alns = pd.DataFrame()
-        #     for sample, df_sample in df_class_counts.groupby('sample_id'):
-        #         df_reads = pd.concat([df_reads, df_sample[df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
-        #         df_alns = pd.concat([df_alns, df_sample[~df_sample.Reference.isin(['Mapped', 'Unmapped'])]])
-        #     df_reads = df_reads.rename(columns={'Percentage of alignments': 'Percentage of Reads'})
-        #     plt = ezc.barplot(
-        #         df_reads[['Reference', 'Percentage of Reads']], hue='sample_id')
-        #     plt.title = dict(text='Reads mapped/unmapped')
-        #     EZChart(plt, theme='epi2melabs', height='400px')
-
-        #     plt = ezc.barplot(
-        #         df_alns[['Reference', 'Percentage of alignments']], hue='sample_id')
-        #     plt.title = dict(text='Alignment counts per target')
-        #     EZChart(plt, theme='epi2melabs', height='400px')
+        # Output the plots to an HTML file
+        html = file_html(grid, CDN, "Contamination Plots")
+        with open("contamination_plots.html", "w") as f:
+            f.write(html)
 
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
