@@ -121,52 +121,32 @@ def plot_contamination(report, class_counts):
             "plasmid)."
         )
 
-        # Prepare data for combined plots
-        df_reads = df_class_counts[df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
-        df_reads['Percentage of Reads'] = df_reads['Percentage of alignments']
+        with Grid(columns=2):
+            # Prepare data for combined plots
+            df_reads = df_class_counts[df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
+            df_reads['Percentage of Reads'] = df_reads['Percentage of alignments']
 
-        df_alns = df_class_counts[~df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
+            df_alns = df_class_counts[~df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
 
-        # Create the first plot: Reads mapped/unmapped
-        source_reads = ColumnDataSource(data=dict(
-            x=[(sample, reference) for sample in df_reads['sample_id'].unique() for reference in ['Mapped', 'Unmapped']],
-            counts=[df_reads[(df_reads['sample_id'] == sample) & (df_reads['Reference'] == reference)]['Percentage of Reads'].values[0] 
-                    if not df_reads[(df_reads['sample_id'] == sample) & (df_reads['Reference'] == reference)].empty else 0
-                    for sample in df_reads['sample_id'].unique() for reference in ['Mapped', 'Unmapped']]
-        ))
+            # Create the first plot: Reads mapped/unmapped
+            df_reads['Sample_Reference'] = df_reads['sample_id'] + '_' + df_reads['Reference']
+            plt_reads = ezc.barplot(
+                df_reads[['Sample_Reference', 'Percentage of Reads']],
+                x='Sample_Reference', y='Percentage of Reads',
+                color='Reference'
+            )
+            plt_reads.title = dict(text='Reads mapped/unmapped')
+            EZChart(plt_reads, theme='epi2melabs', height='400px')
 
-        p1 = figure(x_range=FactorRange(*source_reads.data['x']), height=400, title="Reads mapped/unmapped",
-                    toolbar_location=None, tools="")
-
-        p1.vbar(x='x', top='counts', width=0.9, source=source_reads)
-
-        p1.xgrid.grid_line_color = None
-        p1.y_range.start = 0
-
-        # Create the second plot: Alignment counts per target
-        unique_references = df_alns['Reference'].unique()
-        source_alns = ColumnDataSource(data=dict(
-            x=[(sample, reference) for sample in df_alns['sample_id'].unique() for reference in unique_references],
-            counts=[df_alns[(df_alns['sample_id'] == sample) & (df_alns['Reference'] == reference)]['Percentage of alignments'].values[0] 
-                    if not df_alns[(df_alns['sample_id'] == sample) & (df_alns['Reference'] == reference)].empty else 0
-                    for sample in df_alns['sample_id'].unique() for reference in unique_references]
-        ))
-
-        p2 = figure(x_range=FactorRange(*source_alns.data['x']), height=400, title="Alignment counts per target",
-                    toolbar_location=None, tools="")
-
-        p2.vbar(x='x', top='counts', width=0.9, source=source_alns)
-
-        p2.xgrid.grid_line_color = None
-        p2.y_range.start = 0
-
-        # Combine the plots into a grid
-        grid = gridplot([[p1, p2]], sizing_mode='stretch_both')
-
-        # Output the plots to an HTML file
-        html = file_html(grid, CDN, "Contamination Plots")
-        with open("contamination_plots.html", "w") as f:
-            f.write(html)
+            # Create the second plot: Alignment counts per target
+            df_alns['Sample_Reference'] = df_alns['sample_id'] + '_' + df_alns['Reference']
+            plt_alns = ezc.barplot(
+                df_alns[['Sample_Reference', 'Percentage of alignments']],
+                x='Sample_Reference', y='Percentage of alignments',
+                color='Reference'
+            )
+            plt_alns.title = dict(text='Alignment counts per target')
+            EZChart(plt_alns, theme='epi2melabs', height='400px')
 
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
