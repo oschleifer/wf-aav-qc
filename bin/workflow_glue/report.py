@@ -161,26 +161,25 @@ def plot_read_summary(report, stats):
             'channel': np.uint32,
             'read_number': np.uint32
         })
-    with report.add_section("Read Summary", "Reads"):
+    with report.add_section("Read Summary", "Read Summary"):
         p(
             "Read quality, read length, base yield"
         )
         
         with Grid(columns=3):
             # Histogram of read quality
-            plt_quality = ezc.histogram(
-                df_stats['mean_quality'], bins=50,
-                title='Read Quality',
-                xlabel='Mean Quality', ylabel='Frequency'
+            plt_quality = ezc.barplot(
+                df_stats['mean_quality'], n_boot=50,
+                x='Mean Quality', y='Number of Reads'
             )
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
-            plt_length = ezc.histogram(
-                df_stats['read_length'], bins=50,
-                title='Read Length',
-                xlabel='Read Length', ylabel='Frequency'
+            plt_length = ezc.barplot(
+                df_stats['read_length'],
+                x='Read Length', y='Frequency'
             )
+            plt_length.title = dict(text='Read Length')
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
@@ -191,6 +190,7 @@ def plot_read_summary(report, stats):
                 xlabel='Read Number', ylabel='Cumulative Bases'
             )
             EZChart(plt_yield, theme='epi2melabs', height='400px')
+
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
     df = pd.read_csv(
