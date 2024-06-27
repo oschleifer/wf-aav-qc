@@ -130,8 +130,8 @@ def plot_contamination(report, class_counts):
             # Create the first plot: Reads mapped/unmapped
             plt_reads = ezc.barplot(
                 df_reads,
-                x='sample_id', y='Percentage of Reads',
-                color='Reference', group='Reference'
+                x='Reference', y='Percentage of Reads',
+                color='sample_id', group='Reference'
             )
             plt_reads.title = dict(text='Reads mapped/unmapped')
             plt_reads.xAxis.axisLabel = dict(rotate=45)
@@ -140,8 +140,8 @@ def plot_contamination(report, class_counts):
             # Create the second plot: Alignment counts per target
             plt_alns = ezc.barplot(
                 df_alns,
-                x='sample_id', y='Percentage of alignments',
-                color='Reference', group='Reference'
+                x='Reference', y='Percentage of alignments',
+                color='sample_id', group='Reference'
             )
             plt_alns.title = dict(text='Alignment counts per target')
             plt_alns.xAxis.axisLabel = dict(rotate=45)
@@ -165,22 +165,32 @@ def plot_read_summary(report, stats):
         p(
             "Read quality, read length, base yield"
         )
-        # with Grid(columns=3):
-        #     plt = ezc.barplot(
-        #         df[['read_length']]
-        #     )
-        #     plt.title = dict(text='Read lengths')
-        #     EZChart(plt,  theme='epi2melabs', height='400px')
-            # plt = Plot()
-            # for sample, df_sample in df.groupby('sample_name'):
-            #     df_read_lengths = df_sample.sort_values('read_length', ascending=True)
-            #     plt.dataset(
-            #         df_read_lengths[['read_length']]
-            #     )
-            # plt.series = [dict(type='bar')]
-            # plt.title = dict(text='Read lengths')
-            # EZChart(plt, theme='epi2melabs', height='400px')
+        
+        with Grid(columns=3):
+            # Histogram of read quality
+            plt_quality = ezc.histogram(
+                df_stats['mean_quality'], bins=50,
+                title='Read Quality',
+                xlabel='Mean Quality', ylabel='Frequency'
+            )
+            EZChart(plt_quality, theme='epi2melabs', height='400px')
 
+            # Histogram of read lengths
+            plt_length = ezc.histogram(
+                df_stats['read_length'], bins=50,
+                title='Read Length',
+                xlabel='Read Length', ylabel='Frequency'
+            )
+            EZChart(plt_length, theme='epi2melabs', height='400px')
+
+            # Line graph of base yield
+            df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
+            plt_yield = ezc.lineplot(
+                df_stats, x='read_number', y='cumulative_bases',
+                title='Base Yield Over Time',
+                xlabel='Read Number', ylabel='Cumulative Bases'
+            )
+            EZChart(plt_yield, theme='epi2melabs', height='400px')
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
     df = pd.read_csv(
