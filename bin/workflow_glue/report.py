@@ -9,6 +9,7 @@ from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
 from ezcharts.layout.snippets.table import DataTable
+import sigfig
 import numpy as np
 import pandas as pd
 
@@ -179,14 +180,15 @@ def plot_read_summary(report, stats):
                 hue='sample_name', group='Quality Score'
             )
             plt_quality.title = dict(text='Read Quality')
-            plt_quality.xAxis.tickInterval = 5
+            plt_quality.xAxis.min = 0
+            plt_quality.xAxis.max = 30
             plt_quality.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
-            hist_length, edges_length = np.histogram(df_stats['read_length'], bins=50)
+            hist_length, edges_length = np.histogram(df_stats['read_length']/1000, bins=50)
             df_length = pd.DataFrame({
-                'Read Length': edges_length[:-1],
+                'Read Length / kb': edges_length[:-1]/1000,
                 'Number of Reads': hist_length
             })
             plt_length = ezc.barplot(
@@ -195,27 +197,56 @@ def plot_read_summary(report, stats):
                 hue='sample_name', group='Read Length'
             )
             plt_length.title = dict(text='Read Length')
-            plt_length.xAxis.tickInterval = 2
+            plt_length.xAxis.min = 0
+            plt_length.xAxis.max = max(df_stats['read_length'])
             plt_length.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
-            hist_yield, edges_yield = np.histogram(df_stats['read_length'], bins=50)
+            thinning = 1000
+            length = np.concatenate(([0], np.sort(df_stats["read_length"])), dtype="int")
+            cumsum = np.cumsum(length[::-1])[::-1]
+            mid = cumsum[-1] / 2
+            n50_index = np.searchsorted(cumsum, mid)
+            n50 = length[n50_index]
+
             df_yield = pd.DataFrame({
-                'Read Length': edges_yield[:-1],
-                'Cumulative Bases': hist_yield
-            })
-            df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
-            plt_yield = ezc.lineplot(
-                df_yield, markeres=None,
-                x='Read Length', y='Cumulative Bases',
-                hue='sample_name', group='Read Length'
+                'Read Length / kb': length / 1000, 
+                'Cummulative Bases': cumsum / 1e9}, copy=False)
+
+            if len(df_yield) > thinning:
+                step = len(df_yield) // thinning
+                df_yield = pd.concat((df_yield.loc[::step, :], df_yield.iloc[[-1]]), axis=0)
+
+            plt_base_yield = ezc.lineplot(
+                data=df_yield, hue='sample_name',
+                x='Read Length / kb', y='Cummulative Bases')
+            plt_base_yield.series[0].showSymbol = False
+            plt_base_yield.title = dict(
+                text="Base yield above read length",
+                subtext=(
+                    f"Total yield: {sigfig.round(df_yield.iloc[0]['Cumulative Bases'], sigfigs=3)} Gb "
+                    f"Gb. N50: {sigfig.round(n50, 3)}kb"
+                ),
             )
-            plt_yield.title = dict(text='Base yield above read length')
-            plt_yield.xAxis.tickInterval = 2
-            plt_yield.xAxis.min = 0
-            plt_yield.xAxis.axisLabel = dict(rotate=45)
-            EZChart(plt_yield, theme='epi2melabs', height='400px')
+            EZChart(plt_base_yield, theme='epi2melabs', height='400px')
+
+            # hist_yield, edges_yield = np.histogram(df_stats['read_length']/1000, bins=50)
+            # df_yield = pd.DataFrame({
+            #     'Read Length / kb': edges_yield[:-1],
+            #     'Cumulative Bases': hist_yield
+            # })
+            # df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
+            # plt_yield = ezc.lineplot(
+            #     df_yield, markeres=None,
+            #     x='Read Length', y='Cumulative Bases',
+            #     hue='sample_name', group='Read Length'
+            # )
+            # plt_yield.title = dict(text='Base yield above read length')
+            # plt_yield.xAxis.tickInterval = 2
+            # plt_yield.xAxis.min = 0
+            # plt_yield.xAxis.axisLabel = dict(rotate=45)
+            # EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
