@@ -163,10 +163,6 @@ def plot_read_summary(report, stats):
             'read_number': np.uint32
         })
     with report.add_section("Read Summary", "Read Summary"):
-        p(
-            "Read quality, read length, base yield"
-        )
-        
         with Grid(columns=3):
             # Histogram of read quality
             hist_quality, edges_quality = np.histogram(df_stats['mean_quality'], bins=50)
@@ -179,7 +175,13 @@ def plot_read_summary(report, stats):
                 x='Quality Score', y='Number of Reads',
                 hue='sample_name', group='Quality Score'
             )
-            plt_quality.title = dict(text='Read Quality')
+            plt_quality.title = dict(
+                text='Read Quality',
+                subtext=(
+                    f"Mean: {sigfig.roung(df_stats['mean_quality'].mean())} "
+                    f"Median: {sigfig.round(df_stats['mean_quality'].median())}"
+                ),
+            )
             plt_quality.xAxis.min = 0
             plt_quality.xAxis.max = 30
             plt_quality.xAxis.axisLabel = dict(rotate=45)
@@ -193,10 +195,18 @@ def plot_read_summary(report, stats):
             })
             plt_length = ezc.barplot(
                 df_length, width=1,
-                x='Read Length', y='Number of Reads',
+                x='Read Length / kb', y='Number of Reads',
                 hue='sample_name', group='Read Length'
             )
-            plt_length.title = dict(text='Read Length')
+            plt_length.title = dict(
+                text='Read Length',
+                subtext=(
+                    f"Mean: {sigfig.roung(df_stats['read_length'].mean())} "
+                    f"Median: {sigfig.round(df_stats['read_length'].median())}"
+                    f"Min: {sigfig.round(df_stats['read_length'].min())}"
+                    f"Max: {sigfig.round(df_stats['read_length'].max())}"
+                ),
+            )
             plt_length.xAxis.min = 0
             plt_length.xAxis.max = max(df_stats['read_length'])
             plt_length.xAxis.axisLabel = dict(rotate=45)
@@ -230,23 +240,6 @@ def plot_read_summary(report, stats):
                 ),
             )
             EZChart(plt_base_yield, theme='epi2melabs', height='400px')
-
-            # hist_yield, edges_yield = np.histogram(df_stats['read_length']/1000, bins=50)
-            # df_yield = pd.DataFrame({
-            #     'Read Length / kb': edges_yield[:-1],
-            #     'Cumulative Bases': hist_yield
-            # })
-            # df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
-            # plt_yield = ezc.lineplot(
-            #     df_yield, markeres=None,
-            #     x='Read Length', y='Cumulative Bases',
-            #     hue='sample_name', group='Read Length'
-            # )
-            # plt_yield.title = dict(text='Base yield above read length')
-            # plt_yield.xAxis.tickInterval = 2
-            # plt_yield.xAxis.min = 0
-            # plt_yield.xAxis.axisLabel = dict(rotate=45)
-            # EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
