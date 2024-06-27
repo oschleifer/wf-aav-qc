@@ -127,10 +127,15 @@ def plot_contamination(report, class_counts):
             df_reads['Reference'] = pd.Categorical(df_reads['Reference'], categories=['Unmapped', 'Mapped'], ordered=True)
             df_reads = df_reads.sort_values(by='Reference')
 
+            # Combine Reference and sample_id for unique x-axis labels
+            df_reads['Reference_Sample'] = df_reads['Reference'] + '_' + df_reads['sample_id']
+            df_alns['Reference_Sample'] = df_alns['Reference'] + '_' + df_alns['sample_id']
+
+
             # Create the first plot: Reads mapped/unmapped
             plt_reads = ezc.barplot(
                 df_reads,
-                x='Reference', y='Percentage of Reads',
+                x='Reference_Sample', y='Percentage of Reads',
                 color='sample_id', group='Reference'
             )
             plt_reads.title = dict(text='Reads mapped/unmapped')
@@ -140,7 +145,7 @@ def plot_contamination(report, class_counts):
             # Create the second plot: Alignment counts per target
             plt_alns = ezc.barplot(
                 df_alns,
-                x='Reference', y='Percentage of alignments',
+                x='Reference_Sample', y='Percentage of alignments',
                 color='sample_id', group='Reference'
             )
             plt_alns.title = dict(text='Alignment counts per target')
