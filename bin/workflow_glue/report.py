@@ -127,16 +127,11 @@ def plot_contamination(report, class_counts):
             df_reads['Reference'] = pd.Categorical(df_reads['Reference'], categories=['Unmapped', 'Mapped'], ordered=True)
             df_reads = df_reads.sort_values(by='Reference')
 
-            # Combine Reference and sample_id for unique x-axis labels
-            df_reads['Reference_Sample'] = df_reads['Reference'] + '_' + df_reads['sample_id']
-            df_alns['Reference_Sample'] = df_alns['Reference'] + '_' + df_alns['sample_id']
-
-
             # Create the first plot: Reads mapped/unmapped
             plt_reads = ezc.barplot(
                 df_reads,
                 x='Reference_Sample', y='Percentage of Reads',
-                color='sample_id', group='Reference'
+                hue='sample_id', color='sample_id', group='Reference'
             )
             plt_reads.title = dict(text='Reads mapped/unmapped')
             plt_reads.xAxis.axisLabel = dict(rotate=45)
@@ -146,7 +141,7 @@ def plot_contamination(report, class_counts):
             plt_alns = ezc.barplot(
                 df_alns,
                 x='Reference_Sample', y='Percentage of alignments',
-                color='sample_id', group='Reference'
+                hue='sample_id', group='Reference'
             )
             plt_alns.title = dict(text='Alignment counts per target')
             plt_alns.xAxis.axisLabel = dict(rotate=45)
@@ -183,6 +178,7 @@ def plot_read_summary(report, stats):
                 x='Quality Score', y='Number of Reads'
             )
             plt_quality.title = dict(text='Read Quality')
+            plt_quality.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
@@ -196,6 +192,7 @@ def plot_read_summary(report, stats):
                 x='Read Length', y='Number of Reads'
             )
             plt_length.title = dict(text='Read Length')
+            plt_length.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
@@ -210,6 +207,7 @@ def plot_read_summary(report, stats):
                 x='Read Length', y='Cumulative Bases'
             )
             plt_yield.title = dict(text='Base yield above read length')
+            plt_yield.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
