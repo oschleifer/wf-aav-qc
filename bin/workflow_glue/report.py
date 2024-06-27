@@ -181,7 +181,7 @@ def plot_read_summary(report, stats):
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
-            hist_length, edges_length = np.histogram(df['read_length'], bins=50)
+            hist_length, edges_length = np.histogram(df_stats['read_length'], bins=50)
             df_length = pd.DataFrame({
                 'Read Length': edges_length[:-1],
                 'Number of Reads': hist_length
@@ -194,10 +194,15 @@ def plot_read_summary(report, stats):
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
+            hist_yield, edges_yield = np.histogram(df_stats['read_length'], bins=50)
+            df_yield = pd.DataFrame({
+                'Read Length': edges_yield[:-1],
+                'Cumalative Bases': hist_yield
+            })
             df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
             plt_yield = ezc.lineplot(
-                df_stats, x='read_number', y='cumulative_bases',
-                x='Read Number', y='Cumulative Bases'
+                df_yield,
+                x='Read Length', y='Cumulative Bases'
             )
             plt_yield.title = dict(text='Base yield above read length')
             EZChart(plt_yield, theme='epi2melabs', height='400px')
