@@ -168,16 +168,27 @@ def plot_read_summary(report, stats):
         
         with Grid(columns=3):
             # Histogram of read quality
+            hist_quality, edges_quality = np.histogram(df_stats['mean_quality'], bins=50)
+            df_quality = pd.DataFrame({
+                'Quality Score': edges_quality[:-1],
+                'Number of Reads': hist_quality
+            })
             plt_quality = ezc.barplot(
-                df_stats['mean_quality'], n_boot=50,
-                x='Mean Quality', y='Number of Reads'
+                df_quality,
+                x='Quality Score', y='Number of Reads'
             )
+            plt_quality.title = dict(text='Read Quality')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
+            hist_length, edges_length = np.histogram(df['read_length'], bins=50)
+            df_length = pd.DataFrame({
+                'Read Length': edges_length[:-1],
+                'Number of Reads': hist_length
+            })
             plt_length = ezc.barplot(
-                df_stats['read_length'],
-                x='Read Length', y='Frequency'
+                df_length,
+                x='Read Length', y='Number of Reads'
             )
             plt_length.title = dict(text='Read Length')
             EZChart(plt_length, theme='epi2melabs', height='400px')
@@ -186,9 +197,9 @@ def plot_read_summary(report, stats):
             df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
             plt_yield = ezc.lineplot(
                 df_stats, x='read_number', y='cumulative_bases',
-                title='Base Yield Over Time',
-                xlabel='Read Number', ylabel='Cumulative Bases'
+                x='Read Number', y='Cumulative Bases'
             )
+            plt_yield.title = dict(text='Base yield above read length')
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
