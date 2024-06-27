@@ -129,7 +129,7 @@ def plot_contamination(report, class_counts):
 
             # Create the first plot: Reads mapped/unmapped
             plt_reads = ezc.barplot(
-                df_reads[['Reference', 'Percentage of Reads']],
+                df_reads,
                 x='sample_id', y='Percentage of Reads',
                 color='Reference', group='Reference'
             )
@@ -139,7 +139,7 @@ def plot_contamination(report, class_counts):
 
             # Create the second plot: Alignment counts per target
             plt_alns = ezc.barplot(
-                df_alns[['Reference', 'Percentage of alignments']],
+                df_alns,
                 x='sample_id', y='Percentage of alignments',
                 color='Reference', group='Reference'
             )
@@ -149,7 +149,7 @@ def plot_contamination(report, class_counts):
 
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
-    df = pd.read_csv(
+    df_stats = pd.read_csv(
         stats,
         sep='\t',
         dtype={
