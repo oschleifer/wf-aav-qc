@@ -178,7 +178,7 @@ def plot_read_summary(report, stats):
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
-                    f"Mean: {sigfig.roung(df_stats['mean_quality'].mean())} "
+                    f"Mean: {sigfig.round(df_stats['mean_quality'].mean())} "
                     f"Median: {sigfig.round(df_stats['mean_quality'].median())}"
                 ),
             )
@@ -201,7 +201,7 @@ def plot_read_summary(report, stats):
             plt_length.title = dict(
                 text='Read Length',
                 subtext=(
-                    f"Mean: {sigfig.roung(df_stats['read_length'].mean())} "
+                    f"Mean: {sigfig.round(df_stats['read_length'].mean())} "
                     f"Median: {sigfig.round(df_stats['read_length'].median())}"
                     f"Min: {sigfig.round(df_stats['read_length'].min())}"
                     f"Max: {sigfig.round(df_stats['read_length'].max())}"
