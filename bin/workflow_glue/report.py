@@ -197,7 +197,7 @@ def plot_read_summary(report, stats):
             hist_yield, edges_yield = np.histogram(df_stats['read_length'], bins=50)
             df_yield = pd.DataFrame({
                 'Read Length': edges_yield[:-1],
-                'Cumalative Bases': hist_yield
+                'Cumulative Bases': hist_yield
             })
             df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
             plt_yield = ezc.lineplot(
