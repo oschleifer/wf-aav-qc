@@ -129,7 +129,7 @@ def plot_contamination(report, class_counts):
 
             # Create the first plot: Reads mapped/unmapped
             plt_reads = ezc.barplot(
-                df_reads,
+                df_reads, width=1,
                 x='Reference', y='Percentage of Reads',
                 hue='sample_id', color='sample_id', group='Reference'
             )
@@ -139,7 +139,7 @@ def plot_contamination(report, class_counts):
 
             # Create the second plot: Alignment counts per target
             plt_alns = ezc.barplot(
-                df_alns,
+                df_alns, width=1,
                 x='Reference', y='Percentage of alignments',
                 hue='sample_id', group='Reference'
             )
@@ -174,10 +174,12 @@ def plot_read_summary(report, stats):
                 'Number of Reads': hist_quality
             })
             plt_quality = ezc.barplot(
-                df_quality,
-                x='Quality Score', y='Number of Reads'
+                df_quality, width=1,
+                x='Quality Score', y='Number of Reads',
+                hue='sample_name', group='Quality Score'
             )
             plt_quality.title = dict(text='Read Quality')
+            plt_quality.xAxis.tickInterval = 5
             plt_quality.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
@@ -188,10 +190,12 @@ def plot_read_summary(report, stats):
                 'Number of Reads': hist_length
             })
             plt_length = ezc.barplot(
-                df_length,
-                x='Read Length', y='Number of Reads'
+                df_length, width=1,
+                x='Read Length', y='Number of Reads',
+                hue='sample_name', group='Read Length'
             )
             plt_length.title = dict(text='Read Length')
+            plt_length.xAxis.tickInterval = 2
             plt_length.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
@@ -203,10 +207,13 @@ def plot_read_summary(report, stats):
             })
             df_stats['cumulative_bases'] = df_stats['read_length'].cumsum()
             plt_yield = ezc.lineplot(
-                df_yield,
-                x='Read Length', y='Cumulative Bases'
+                df_yield, markeres=None,
+                x='Read Length', y='Cumulative Bases',
+                hue='sample_name', group='Read Length'
             )
             plt_yield.title = dict(text='Base yield above read length')
+            plt_yield.xAxis.tickInterval = 2
+            plt_yield.xAxis.min = 0
             plt_yield.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
