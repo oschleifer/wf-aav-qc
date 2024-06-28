@@ -235,13 +235,13 @@ def plot_read_summary(report, stats):
 
             # Plot combined data
             plt_base_yield = ezc.lineplot(
-                data=df_yield, hue='Barcode',
+                data=combined_df, hue='Barcode',
                 x='Read Length / kb', y='Cummulative Bases')
             plt_base_yield.series[0].showSymbol = False
             plt_base_yield.title = dict(
                 text="Base yield above read length",
                 subtext=(
-                    f"Total yield: {sigfig.round(df_yield.iloc[0]['Cumulative Bases'], sigfigs=3)} Gb "
+                    f"Total yield: {sigfig.round(combined_df.iloc[0]['Cumulative Bases'], sigfigs=3)} Gb "
                     f"Gb. N50: {sigfig.round(n50, 3)}kb"
                 ),
             )
