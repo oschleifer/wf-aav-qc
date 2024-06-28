@@ -213,23 +213,33 @@ def plot_read_summary(report, stats):
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
-            thinning = 1000
-            length = np.concatenate(([0], np.sort(df_stats["read_length"])), dtype="int")
-            cumsum = np.cumsum(length[::-1])[::-1]
-            mid = cumsum[-1] / 2
-            n50_index = np.searchsorted(cumsum, mid)
-            n50 = length[n50_index]
+            # Create an empty DataFrame for all samples
+            combined_df = pd.DataFrame
 
-            df_yield = pd.DataFrame({
-                'Read Length / kb': length / 1000, 
-                'Cummulative Bases': cumsum / 1e9}, copy=False)
+            for sample_name, df_sample in df_stats.grouby('sample_name'):
+                length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="int")
+                cumsum = np.cumsum(length[::-1])[::-1]
 
-            if len(df_yield) > thinning:
-                step = len(df_yield) // thinning
-                df_yield = pd.concat((df_yield.loc[::step, :], df_yield.iloc[[-1]]), axis=0)
+                mid = cumsum[-1] / 2
+                n50_index = np.searchsorted(cumsum, mid)
+                n50 = length[n50_index]
 
+                df_yield = pd.DataFrame({
+                    'Read Length / kb': length / 1000, 
+                    'Cummulative Bases': cumsum / 1e9,
+                    'Barcode': sample_name
+                })
+
+                if len(df_yield) > 1000:
+                    step = len(df_yield) // 1000
+                    df_yield = pd.concat((df_yield.loc[::step, :], df_yield.iloc[[-1]]), axis=0)
+
+                # add barcode to combined DataFrame
+                combined_df = pd.concat([combined_df, df_yield], ignore_index=True)
+
+            # Plot combined data
             plt_base_yield = ezc.lineplot(
-                data=df_yield, hue='sample_name',
+                data=df_yield, hue='Barcode',
                 x='Read Length / kb', y='Cummulative Bases')
             plt_base_yield.series[0].showSymbol = False
             plt_base_yield.title = dict(
