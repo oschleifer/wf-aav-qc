@@ -230,10 +230,6 @@ def plot_read_summary(report, stats):
                     'Barcode': sample_name
                 })
 
-                if len(df_yield) > 1000:
-                    step = len(df_yield) // 1000
-                    df_yield = pd.concat((df_yield.loc[::step, :], df_yield.iloc[[-1]]), axis=0)
-
                 # add barcode to combined DataFrame
                 combined_df = pd.concat([combined_df, df_yield], ignore_index=True)
 
