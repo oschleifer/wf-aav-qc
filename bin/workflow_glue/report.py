@@ -165,22 +165,25 @@ def plot_read_summary(report, stats):
     with report.add_section("Read Summary", "Read Summary"):
         with Grid(columns=3):
             # Histogram of read quality
-            hist_quality, edges_quality = np.histogram(df_stats['mean_quality'], bins=50)
-            df_quality = pd.DataFrame({
-                'Quality Score': edges_quality[:-1],
-                'Number of Reads': hist_quality,
-                'Barcode': df_stats['sample_name'].iloc[0]
-            })
+            combined_qual = pd.DataFrame()
+            for sample_name, df_sample in df_stats.groupby('sample_name'):
+                hist_quality, edges_quality = np.histogram(df_stats['mean_quality'], bins=50)
+                df_quality = pd.DataFrame({
+                    'Quality Score': edges_quality[:-1],
+                    'Number of Reads': hist_quality,
+                    'Barcode': df_stats['sample_name'].iloc[0]
+                })
+                combined_qual = pd.concat(combined_qual, df_quality)
             plt_quality = ezc.barplot(
-                df_quality, width=1,
+                combined_qual, width=1,
                 x='Quality Score', y='Number of Reads',
                 hue='Barcode', group='Quality Score'
             )
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
-                    f"Mean: {sigfig.round(df_stats['mean_quality'].mean(), sigfigs=3)} "
-                    f"Median: {sigfig.round(df_stats['mean_quality'].median(), sigfigs=2)}"
+                    f"Mean: {round(df_stats['mean_quality'].mean())} "
+                    f"Median: {round(df_stats['mean_quality'].median())}"
                 ),
             )
             plt_quality.xAxis.min = 0
@@ -190,24 +193,27 @@ def plot_read_summary(report, stats):
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
-            hist_length, edges_length = np.histogram(df_stats['read_length']/1000, bins=50)
-            df_length = pd.DataFrame({
-                'Read Length / kb': edges_length[:-1]/1000,
-                'Number of Reads': hist_length,
-                'Barcode': df_stats['sample_name'].iloc[0]
-            })
+            combined_lengths = pd.DataFrame()
+            for sample_name, df_sample in df_stats.groupby('sample_name'):
+                hist_length, edges_length = np.histogram(df_stats['read_length']/1000, bins=50)
+                df_length = pd.DataFrame({
+                    'Read Length / kb': edges_length[:-1],
+                    'Number of Reads': hist_length,
+                    'Barcode': df_stats['sample_name'].iloc[0]
+                })
+                combined_lengths = pd.concat(combined_lengths, df_length)
             plt_length = ezc.barplot(
-                df_length, width=1,
+                combined_lengths, width=1,
                 x='Read Length / kb', y='Number of Reads',
                 hue='Barcode', group='Read Length'
             )
             plt_length.title = dict(
                 text='Read Length',
                 subtext=(
-                    f"Mean: {sigfig.round(df_stats['read_length'].mean(), sigfigs=5)} "
-                    f"Median: {sigfig.round(df_stats['read_length'].median(), sigfigs=5)}"
-                    f"Min: {sigfig.round(df_stats['read_length'].min(), sigfigs=5)}"
-                    f"Max: {sigfig.round(df_stats['read_length'].max(), sigfigs=5)}"
+                    f"Mean: {round(df_stats['read_length'].mean())} "
+                    f"Median: {round(df_stats['read_length'].median())}"
+                    f"Min: {round(df_stats['read_length'].min())}"
+                    f"Max: {round(df_stats['read_length'].max())}"
                 ),
             )
             plt_length.xAxis.min = 0
@@ -216,7 +222,6 @@ def plot_read_summary(report, stats):
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
-            # Create an empty DataFrame for all samples
             combined_df = pd.DataFrame()
 
             for sample_name, df_sample in df_stats.groupby('sample_name'):
@@ -237,14 +242,15 @@ def plot_read_summary(report, stats):
                 combined_df = pd.concat([combined_df, df_yield], ignore_index=True)
 
             # Plot combined data
-            plt_base_yield = ezc.lineplot(
+            plt_yield = ezc.lineplot(
                 data=combined_df, hue='Barcode',
                 x='Read Length / kb', y='Cumulative Bases')
-            plt_base_yield.series[0].showSymbol = False
-            plt_base_yield.title = dict(
+            for series in plt_yield.series:
+                series.showSymbol = False
+            plt_yield.title = dict(
                 text="Base yield above read length",
             )
-            EZChart(plt_base_yield, theme='epi2melabs', height='400px')
+            EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
