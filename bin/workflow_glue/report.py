@@ -214,7 +214,7 @@ def plot_read_summary(report, stats):
 
             # Line graph of base yield
             # Create an empty DataFrame for all samples
-            combined_df = pd.DataFrame
+            combined_df = pd.DataFrame()
 
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="int")
