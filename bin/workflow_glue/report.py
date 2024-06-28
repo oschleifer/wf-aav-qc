@@ -226,7 +226,7 @@ def plot_read_summary(report, stats):
 
                 df_yield = pd.DataFrame({
                     'Read Length / kb': length / 1000, 
-                    'Cummulative Bases': cumsum / 1e9,
+                    'Cumulative Bases': cumsum / 1e9,
                     'Barcode': sample_name
                 })
 
@@ -236,7 +236,7 @@ def plot_read_summary(report, stats):
             # Plot combined data
             plt_base_yield = ezc.lineplot(
                 data=combined_df, hue='Barcode',
-                x='Read Length / kb', y='Cummulative Bases')
+                x='Read Length / kb', y='Cumulative Bases')
             plt_base_yield.series[0].showSymbol = False
             plt_base_yield.title = dict(
                 text="Base yield above read length",
