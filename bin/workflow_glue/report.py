@@ -179,12 +179,13 @@ def plot_read_summary(report, stats):
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
-                    f"Mean: {sigfig.round(df_stats['mean_quality'].mean())} "
-                    f"Median: {sigfig.round(df_stats['mean_quality'].median())}"
+                    f"Mean: {sigfig.round(df_stats['mean_quality'].mean(), sigfigs=3)} "
+                    f"Median: {sigfig.round(df_stats['mean_quality'].median(), sigfigs=2)}"
                 ),
             )
             plt_quality.xAxis.min = 0
             plt_quality.xAxis.max = 30
+            plt_quality.xAxis.splitNumber = 6
             plt_quality.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
@@ -203,10 +204,10 @@ def plot_read_summary(report, stats):
             plt_length.title = dict(
                 text='Read Length',
                 subtext=(
-                    f"Mean: {sigfig.round(df_stats['read_length'].mean())} "
-                    f"Median: {sigfig.round(df_stats['read_length'].median())}"
-                    f"Min: {sigfig.round(df_stats['read_length'].min())}"
-                    f"Max: {sigfig.round(df_stats['read_length'].max())}"
+                    f"Mean: {sigfig.round(df_stats['read_length'].mean(), sigfigs=5)} "
+                    f"Median: {sigfig.round(df_stats['read_length'].median(), sigfigs=5)}"
+                    f"Min: {sigfig.round(df_stats['read_length'].min(), sigfigs=5)}"
+                    f"Max: {sigfig.round(df_stats['read_length'].max(), sigfigs=5)}"
                 ),
             )
             plt_length.xAxis.min = 0
@@ -239,13 +240,9 @@ def plot_read_summary(report, stats):
             plt_base_yield = ezc.lineplot(
                 data=combined_df, hue='Barcode',
                 x='Read Length / kb', y='Cumulative Bases')
-            plt_base_yield.series.showSymbol = False
+            plt_base_yield.series[0].showSymbol = False
             plt_base_yield.title = dict(
                 text="Base yield above read length",
-                subtext=(
-                    f"Total yield: {sigfig.round(combined_df.iloc[0]['Cumulative Bases'], sigfigs=3)} Gb "
-                    f"Gb. N50: {sigfig.round(n50, 3)}kb"
-                ),
             )
             EZChart(plt_base_yield, theme='epi2melabs', height='400px')
 
