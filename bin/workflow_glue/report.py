@@ -168,12 +168,13 @@ def plot_read_summary(report, stats):
             hist_quality, edges_quality = np.histogram(df_stats['mean_quality'], bins=50)
             df_quality = pd.DataFrame({
                 'Quality Score': edges_quality[:-1],
-                'Number of Reads': hist_quality
+                'Number of Reads': hist_quality,
+                'Barcode': df_stats['sample_name'].iloc[0]
             })
             plt_quality = ezc.barplot(
                 df_quality, width=1,
                 x='Quality Score', y='Number of Reads',
-                hue='sample_name', group='Quality Score'
+                hue='Barcode', group='Quality Score'
             )
             plt_quality.title = dict(
                 text='Read Quality',
@@ -191,12 +192,13 @@ def plot_read_summary(report, stats):
             hist_length, edges_length = np.histogram(df_stats['read_length']/1000, bins=50)
             df_length = pd.DataFrame({
                 'Read Length / kb': edges_length[:-1]/1000,
-                'Number of Reads': hist_length
+                'Number of Reads': hist_length,
+                'Barcode': df_stats['sample_name'].iloc[0]
             })
             plt_length = ezc.barplot(
                 df_length, width=1,
                 x='Read Length / kb', y='Number of Reads',
-                hue='sample_name', group='Read Length'
+                hue='Barcode', group='Read Length'
             )
             plt_length.title = dict(
                 text='Read Length',
@@ -237,7 +239,7 @@ def plot_read_summary(report, stats):
             plt_base_yield = ezc.lineplot(
                 data=combined_df, hue='Barcode',
                 x='Read Length / kb', y='Cumulative Bases')
-            plt_base_yield.series[0].showSymbol = False
+            plt_base_yield.series.showSymbol = False
             plt_base_yield.title = dict(
                 text="Base yield above read length",
                 subtext=(
