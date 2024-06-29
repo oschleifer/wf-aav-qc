@@ -173,7 +173,7 @@ def plot_read_summary(report, stats):
                     'Number of Reads': hist_quality,
                     'Barcode': df_stats['sample_name'].iloc[0]
                 })
-                combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
+                combined_qual = pd.concat([combined_qual, df_quality])
             plt_quality = ezc.barplot(
                 combined_qual, width=1,
                 x='Quality Score', y='Number of Reads',
@@ -201,7 +201,7 @@ def plot_read_summary(report, stats):
                     'Number of Reads': hist_length,
                     'Barcode': df_stats['sample_name'].iloc[0]
                 })
-                combined_lengths = pd.concat([combined_lengths, df_length], ignore_index=True)
+                combined_lengths = pd.concat([combined_lengths, df_length])
             plt_length = ezc.barplot(
                 combined_lengths, width=1,
                 x='Read Length / kb', y='Number of Reads',
