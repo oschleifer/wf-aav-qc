@@ -170,14 +170,17 @@ def plot_read_summary(report, stats):
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 qual_score = np.sort(df_sample["mean_quality"])
                 cum_reads = np.arange(1, len(qual_score)+1)
+                sorted_indices = np.argsort(qual_score)
+                qual_score_sorted = qual_score[sorted_indices]
+                num_reads_sorted = cum_reads[sorted_indices]
+                barcodes_sorted = sample_name[sorted_indices]
                 df_quality = pd.DataFrame({
-                    'Quality Score': qual_score,
-                    'Number of Reads': cum_reads,
-                    'Barcode': sample_name
+                    'Quality Score': qual_score_sorted,
+                    'Number of Reads': num_reads_sorted,
+                    'Barcode': barcodes_sorted
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
-            combined_qual = combined_qual.sort_values(by=['Barcode', 'Quality Score'])
-            
+
             plt_quality = ezc.lineplot(
                 combined_qual, 
                 x='Quality Score', y='Number of Reads',
@@ -204,16 +207,24 @@ def plot_read_summary(report, stats):
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 read_len = np.sort(df_sample["read_length"]/1000)
                 cum_reads = np.arange(1, len(read_len) + 1)
+                bins = np.arange(0, max(df_stats['read_length'])/1000, 1)
+                binned_scores = np.digitize(read_len, bins)
                 df_length = pd.DataFrame({
                     'Read Length / kb': read_len,
                     'Number of Reads': cum_reads,
                     'Barcode': sample_name
                 })
+                df_length['Read Length bin'] = binned_scores
                 combined_lengths = pd.concat([combined_lengths, df_length], ignore_index=True)
+            binned_data = combined_lengths.groupby('Read Length bin').agg({
+                'Read Length / kb': 'mean',
+                'Number of Reads': 'mean',
+                'Barcode': 'first'
+            }).reset_index()
             plt_length = ezc.lineplot(
-                combined_lengths,
+                binned_data,
                 x='Read Length / kb', y='Number of Reads',
-                hue='Barcode', group='Read Length'
+                hue='Barcode', group='Barcode'
             )
             for series in plt_length.series:
                 series.showSymbol = False
