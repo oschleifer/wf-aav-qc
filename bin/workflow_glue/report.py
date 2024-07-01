@@ -176,36 +176,27 @@ def plot_read_summary(report, stats):
                     'Barcode': sample_name
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
-            plt_quality = {
-                'type' : 'scatter',
-                'data' : combined_qual.to_dict(orient='records'),
-                'xAxis' : {'type': 'value', 'name': 'Quality Score'},
-                'yAxis': { 'type': 'value', 'name': 'Number of Reads'},
-                'series': [{'type': 'value', 'name': barcode, 'data': data['Number of Reads'].tolist()}
-                           for barcode, data in combined_qual.groupby('Barcode')],
-                'title': {'text': 'Read Quality',
-                          'subtext': (f"Mean: {round(df_stats['mean_quality'].mean())}"
-                                      f"Median: {round(df_stats['mean_quality'].median())}")},
-            }
-            # plt_quality = ezc.scatterplot(
-            #     combined_qual, 
-            #     x='Quality Score', y='Number of Reads',
-            #     hue='Barcode', group='Quality Score'
-            # )
-            # for series in plt_quality.series:
-            #     series.showSymbol = False
-            # plt_quality.title = dict(
-            #     text='Read Quality',
-            #     subtext=(
-            #         f"Mean: {round(df_stats['mean_quality'].mean())} "
-            #         f"Median: {round(df_stats['mean_quality'].median())}"
-            #     ),
-            #     left='center',
-            #     padding=[20, 5, 5, 5]  # Add padding to avoid overlap
-            # )
-            # plt_quality.xAxis.min = 0
-            # plt_quality.xAxis.max = 30
-            # plt_quality.xAxis.splitNumber = 6
+            combined_qual = combined_qual.sort_values(by=['Barcode', 'Quality Score'])
+            
+            plt_quality = ezc.lineplot(
+                combined_qual, 
+                x='Quality Score', y='Number of Reads',
+                hue='Barcode', group='Quality Score'
+            )
+            for series in plt_quality.series:
+                series.showSymbol = False
+            plt_quality.title = dict(
+                text='Read Quality',
+                subtext=(
+                    f"Mean: {round(df_stats['mean_quality'].mean())} "
+                    f"Median: {round(df_stats['mean_quality'].median())}"
+                ),
+                left='center',
+                padding=[20, 5, 5, 5]  # Add padding to avoid overlap
+            )
+            plt_quality.xAxis.min = 0
+            plt_quality.xAxis.max = 30
+            plt_quality.xAxis.splitNumber = 6
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
