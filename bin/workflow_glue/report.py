@@ -162,9 +162,10 @@ def plot_read_summary(report, stats):
             'channel': np.uint32,
             'read_number': np.uint32
         })
+    
     with report.add_section("Read Summary", "Read Summary"):
         with Grid(columns=3):
-            # Histogram of read quality
+            # Line plot of read quality
             combined_qual = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 hist_quality, edges_quality = np.histogram(df_sample['mean_quality'], bins=50)
@@ -197,7 +198,7 @@ def plot_read_summary(report, stats):
             plt_quality.xAxis.axisLabel.formatter = '{value}'
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
-            # Histogram of read lengths
+            # Line plot of read lengths
             combined_lengths = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 hist_length, edges_length = np.histogram(df_sample['read_length']/1000, bins=50)
@@ -224,7 +225,7 @@ def plot_read_summary(report, stats):
                 ),
             )
             plt_length.xAxis.min = 0
-            plt_length.xAxis.max = max(df_stats['read_length'])
+            plt_length.xAxis.max = max(df_stats['read_length']) / 1000
             plt_length.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
@@ -252,6 +253,7 @@ def plot_read_summary(report, stats):
             plt_yield.title = dict(
                 text="Base yield above read length",
             )
+            plt_yield.xAxis.axisLabel.formatter = '{value}'  # Set custom x-axis tick labels
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
