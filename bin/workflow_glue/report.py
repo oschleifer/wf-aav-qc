@@ -196,7 +196,6 @@ def plot_read_summary(report, stats):
             plt_quality.xAxis.max = 30
             plt_quality.xAxis.splitNumber = 6
             plt_quality.xAxis.axisLabel = dict(rotate=45)
-            plt_quality.xAxis.axisLabel.formatter = '{value}'
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
@@ -229,7 +228,6 @@ def plot_read_summary(report, stats):
             plt_length.xAxis.min = 0
             plt_length.xAxis.max = max(df_stats['read_length']) / 1000
             plt_length.xAxis.axisLabel = dict(rotate=45)
-            plt_length.xAxis.axisLabel.formatter = '{value}'
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
