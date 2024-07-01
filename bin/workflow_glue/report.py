@@ -164,7 +164,31 @@ def plot_read_summary(report, stats):
         })
     
     with report.add_section("Read Summary", "Read Summary"):
-        with Grid(columns=3):
+        with Grid(columns=4):
+            max_length = df_stats['read_length'].max()
+            bins = np.arange(0, max_length + 50, 50)
+            df_stats['bins'] = pd.cut(df_stats['read_length'], bins=50,right=False)
+            mean_read = df_stats.groupby('bins')['read_length'].mean().reset_index()
+            mean_read['bin_mid'] = mean_read['bins'].apply(lambda x: x.left + 50 / 2)
+            df_len = mean_read[['bin_mid', 'read_length']].rename(columns={'bin_mid': 'Bin Midpoint (bp)', 'read_length': 'Mean Read Length (bp)'})
+
+            # Create the line plot with EZChart
+            plt_mean_read_length = ezc.lineplot(
+                data=df_len,
+                x='Bin Midpoint (bp)',
+                y='Mean Read Length (bp)'
+            )
+
+            # Customize the plot if necessary
+            plt_mean_read_length.title = dict(
+                text="Mean Read Length in Bins of 50",
+            )
+            for series in plt_mean_read_length.series:
+                series.showSymbol = True  # Show symbols for each data point
+
+            # Display the plot
+            EZChart(plt_mean_read_length, theme='epi2melabs', height='400px')
+
             # Line plot of read quality
             combined_qual = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
@@ -182,17 +206,6 @@ def plot_read_summary(report, stats):
                 x='Quality Score', y='Number of Reads',
                 hue='Barcode', group='Quality Score'
             )
-            # Access the underlying matplotlib Axes
-            ax = plt_quality.ax
-
-            # Example line values to overlay on the bar plot
-            line_values = np.linspace(0, 30, 100)  # Adjust as per your data or needs
-
-            # Add a line plot using matplotlib directly
-            ax.plot(line_values, np.sin(line_values), color='red', linestyle='--', label='Example Line')
-
-            for series in plt_quality.series:
-                series.showSymbol = False
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
@@ -200,8 +213,10 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())}"
                 ),
                 left='center',
-                padding=[20, 5, 5, 5]  # Add padding to avoid overlap
+                padding=[10, 1, 1, 1]  # Add padding to avoid overlap
             )
+            for series in plt_quality.series:
+                series.showSymbol = False
             plt_quality.xAxis.min = 0
             plt_quality.xAxis.max = 30
             plt_quality.xAxis.splitNumber = 6
@@ -221,7 +236,7 @@ def plot_read_summary(report, stats):
             plt_length = ezc.lineplot(
                 combined_lengths,
                 x='Read Length / kb', y='Number of Reads',
-                hue='Barcode', group='Read Length'
+                hue='Barcode', group='Read Length / kb'
             )
             for series in plt_length.series:
                 series.showSymbol = False
@@ -246,7 +261,7 @@ def plot_read_summary(report, stats):
                 cumsum = np.cumsum(length[::-1])[::-1]
                 df_yield = pd.DataFrame({
                     'Read Length / kb': length / 1000, 
-                    'Cumulative Bases': cumsum / 1e9,
+                    'Yield above length / Gbases': cumsum / 1e9,
                     'Barcode': sample_name
                 })
 
@@ -256,7 +271,7 @@ def plot_read_summary(report, stats):
             # Plot combined data
             plt_yield = ezc.lineplot(
                 data=combined_df, hue='Barcode',
-                x='Read Length / kb', y='Cumulative Bases')
+                x='Read Length / kb', y='Yield above length / Gbases')
             for series in plt_yield.series:
                 series.showSymbol = False
             plt_yield.title = dict(
