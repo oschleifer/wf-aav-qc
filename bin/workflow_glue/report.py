@@ -167,7 +167,7 @@ def plot_read_summary(report, stats):
         with Grid(columns=4):
             max_length = df_stats['read_length'].max()
             bins = np.arange(0, max_length + 50, 50)
-            df_stats['bins'] = pd.cut(df_stats['read_length'], bins=50,right=False)
+            df_stats['bins'] = pd.cut(df_stats['read_length'], bins=bins,right=False)
             mean_read = df_stats.groupby('bins')['read_length'].mean().reset_index()
             mean_read['bin_mid'] = mean_read['bins'].apply(lambda x: x.left + 50 / 2)
             df_len = mean_read[['bin_mid', 'read_length']].rename(columns={'bin_mid': 'Bin Midpoint (bp)', 'read_length': 'Mean Read Length (bp)'})
