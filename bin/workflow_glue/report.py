@@ -174,22 +174,27 @@ def plot_read_summary(report, stats):
                     'Barcode': sample_name
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
-            plt_quality = ezc.barplot(
-                combined_qual, width=1,
+            plt_quality = ezc.lineplot(
+                combined_qual, 
                 x='Quality Score', y='Number of Reads',
                 hue='Barcode', group='Quality Score'
             )
+            for series in plt_quality.series:
+                series.showSymbol = False
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
                     f"Mean: {round(df_stats['mean_quality'].mean())} "
                     f"Median: {round(df_stats['mean_quality'].median())}"
                 ),
+                left='center',
+                padding=[20, 5, 5, 5]  # Add padding to avoid overlap
             )
             plt_quality.xAxis.min = 0
             plt_quality.xAxis.max = 30
             plt_quality.xAxis.splitNumber = 6
             plt_quality.xAxis.axisLabel = dict(rotate=45)
+            plt_quality.xAxis.axisLabel.formatter = '{value}'
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Histogram of read lengths
@@ -202,11 +207,13 @@ def plot_read_summary(report, stats):
                     'Barcode': sample_name
                 })
                 combined_lengths = pd.concat([combined_lengths, df_length], ignore_index=True)
-            plt_length = ezc.barplot(
-                combined_lengths, width=1,
+            plt_length = ezc.lineplot(
+                combined_lengths,
                 x='Read Length / kb', y='Number of Reads',
                 hue='Barcode', group='Read Length'
             )
+            for series in plt_length.series:
+                series.showSymbol = False
             plt_length.title = dict(
                 text='Read Length',
                 subtext=(
@@ -227,11 +234,6 @@ def plot_read_summary(report, stats):
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="int")
                 cumsum = np.cumsum(length[::-1])[::-1]
-
-                mid = cumsum[-1] / 2
-                n50_index = np.searchsorted(cumsum, mid)
-                n50 = length[n50_index]
-
                 df_yield = pd.DataFrame({
                     'Read Length / kb': length / 1000, 
                     'Cumulative Bases': cumsum / 1e9,
