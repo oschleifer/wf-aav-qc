@@ -254,7 +254,6 @@ def plot_read_summary(report, stats):
             plt_yield.title = dict(
                 text="Base yield above read length",
             )
-            plt_yield.xAxis.axisLabel.formatter = '{value}'  # Set custom x-axis tick labels
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
