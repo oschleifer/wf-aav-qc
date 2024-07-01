@@ -176,7 +176,7 @@ def plot_read_summary(report, stats):
                     'Barcode': sample_name
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
-            plt_quality = ezc.lineplot(
+            plt_quality = ezc.scatterplot(
                 combined_qual, 
                 x='Quality Score', y='Number of Reads',
                 hue='Barcode', group='Quality Score'
@@ -195,7 +195,6 @@ def plot_read_summary(report, stats):
             plt_quality.xAxis.min = 0
             plt_quality.xAxis.max = 30
             plt_quality.xAxis.splitNumber = 6
-            plt_quality.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
@@ -227,7 +226,6 @@ def plot_read_summary(report, stats):
             )
             plt_length.xAxis.min = 0
             plt_length.xAxis.max = max(df_stats['read_length']) / 1000
-            plt_length.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
