@@ -167,7 +167,7 @@ def plot_read_summary(report, stats):
             # Histogram of read quality
             combined_qual = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                hist_quality, edges_quality = np.histogram(df_stats['mean_quality'], bins=50)
+                hist_quality, edges_quality = np.histogram(df_sample['mean_quality'], bins=50)
                 df_quality = pd.DataFrame({
                     'Quality Score': edges_quality[:-1],
                     'Number of Reads': hist_quality,
@@ -195,7 +195,7 @@ def plot_read_summary(report, stats):
             # Histogram of read lengths
             combined_lengths = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                hist_length, edges_length = np.histogram(df_stats['read_length']/1000, bins=50)
+                hist_length, edges_length = np.histogram(df_sample['read_length']/1000, bins=50)
                 df_length = pd.DataFrame({
                     'Read Length / kb': edges_length[:-1],
                     'Number of Reads': hist_length,
