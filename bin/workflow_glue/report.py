@@ -168,10 +168,11 @@ def plot_read_summary(report, stats):
             # Line plot of read quality
             combined_qual = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                hist_quality, edges_quality = np.histogram(df_sample['mean_quality'], bins=50)
+                qual_score = np.concatenate(([0], np.sort(df_sample["mean_quality"])), dtype="int")
+                cum_reads = np.cumsum(qual_score[::-1])[::-1]
                 df_quality = pd.DataFrame({
-                    'Quality Score': edges_quality[:-1],
-                    'Number of Reads': hist_quality,
+                    'Quality Score': qual_score,
+                    'Number of Reads': cum_reads,
                     'Barcode': sample_name
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
@@ -201,10 +202,11 @@ def plot_read_summary(report, stats):
             # Line plot of read lengths
             combined_lengths = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                hist_length, edges_length = np.histogram(df_sample['read_length']/1000, bins=50)
+                read_len = np.concatenate(([0], np.sort(df_sample["read_length"]/1000)), dtype="int")
+                cum_reads = np.cumsum(read_len[::-1])[::-1]
                 df_length = pd.DataFrame({
-                    'Read Length / kb': edges_length[:-1],
-                    'Number of Reads': hist_length,
+                    'Read Length / kb': read_len,
+                    'Number of Reads': cum_reads,
                     'Barcode': sample_name
                 })
                 combined_lengths = pd.concat([combined_lengths, df_length], ignore_index=True)
