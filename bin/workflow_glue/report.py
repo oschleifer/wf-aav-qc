@@ -168,8 +168,8 @@ def plot_read_summary(report, stats):
             # Line plot of read quality
             combined_qual = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                qual_score = np.concatenate(([0], np.sort(df_sample["mean_quality"])), dtype="int")
-                cum_reads = np.cumsum(qual_score[::-1])[::-1]
+                qual_score = np.sort(df_sample["mean_quality"])
+                cum_reads = np.arrange(1, len(qual_score)+1)
                 df_quality = pd.DataFrame({
                     'Quality Score': qual_score,
                     'Number of Reads': cum_reads,
@@ -202,8 +202,8 @@ def plot_read_summary(report, stats):
             # Line plot of read lengths
             combined_lengths = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                read_len = np.concatenate(([0], np.sort(df_sample["read_length"]/1000)), dtype="int")
-                cum_reads = np.cumsum(read_len[::-1])[::-1]
+                read_len = np.sort(df_sample["read_length"]/1000)
+                cum_reads = np.arrange(1, len(read_len) + 1)
                 df_length = pd.DataFrame({
                     'Read Length / kb': read_len,
                     'Number of Reads': cum_reads,
@@ -229,6 +229,7 @@ def plot_read_summary(report, stats):
             plt_length.xAxis.min = 0
             plt_length.xAxis.max = max(df_stats['read_length']) / 1000
             plt_length.xAxis.axisLabel = dict(rotate=45)
+            plt_length.xAxis.axisLabel.formatter = '{value}'
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
