@@ -178,7 +178,7 @@ def plot_read_summary(report, stats):
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
             plt_quality = {
                 'type' : 'scatter',
-                'data' : combined_qual.to_dict(oriend='records'),
+                'data' : combined_qual.to_dict(orient='records'),
                 'xAxis' : {'type': 'value', 'name': 'Quality Score'},
                 'yAxis': { 'type': 'value', 'name': 'Number of Reads'},
                 'series': [{'type': 'value', 'name': barcode, 'data': data['Number of Reads'].tolist()}
