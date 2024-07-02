@@ -162,19 +162,30 @@ def plot_read_summary(report, stats):
             'channel': np.uint32,
             'read_number': np.uint32
         })
+    
+    bins = np.arange(0, df_stats['mean_quality'].max() + 1, 1)
+    df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], bins)
 
     with report.add_section("Read Summary", "Read Summary"):
         with Grid(columns=3):
             # Line plot of quality scores
-            df_quality = df_stats.groupby(['sample_name', 'mean_quality']).size().reset_index(name='read_count')
+            df_quality = df_stats.groupby(['sample_name', 'binned_quality']).size().reset_index(name='read_count')
+            df_quality['binned_quality'] = df_quality['binned_quality'].astype(str)
+
             combined_qstats = pd.DataFrame()
             for sample_name in df_quality['sample_name'].unique():
                 barcode = df_quality[df_quality['sample_name'] == sample_name]
                 combined_qstats = pd.concat([combined_qstats, barcode], ignore_index = True)
 
+            combined_qstats = combined_qstats.rename(columns={
+                'sample_name': 'Barcode',
+                'binned_quality': 'Quality Score',
+                'read_count': 'Number of Reads'
+            })
+
             plt_quality = ezc.lineplot(
-                data=combined_qstats, hue='sample_name',
-                x='mean_quality', y='read_count'
+                data=combined_qstats, hue='Barcode',
+                x='Quality Score', y='Number of Reads'
             )
             plt_quality.title = dict(
                 text="Read Quality"
