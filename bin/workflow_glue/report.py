@@ -165,54 +165,17 @@ def plot_read_summary(report, stats):
 
     with report.add_section("Read Summary", "Read Summary"):
         with Grid(columns=3):
-            # Line plot of read quality
-            combined_qual = pd.DataFrame()
-            mean_quality_per_bin = []
-            for sample_name, df_sample in df_stats.groupby('sample_name'):
-                hist_quality, edges_quality = np.histogram(df_sample['mean_quality'], bins=50)
-                df_quality = pd.DataFrame({
-                    'Quality Score': edges_quality[:-1],
-                    'Number of Reads': hist_quality,
-                    'Barcode': sample_name
-                })
-                combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
-                bin_means = [
-                    df_sample[(df_sample['mean_quality'] >= edges_quality[i]) &
-                              (df_sample['mean_quality'] < edges_quality[i + 1])
-                             ]['mean_quality'].mean() for i in range(len(edges_quality) - 1)
-                ]
-                mean_quality_per_bin.append(bin_means)
-
-            # Average mean quality per bin across all samples
-            mean_quality_per_bin = np.nanmean(mean_quality_per_bin, axis=0)
-            line_data = [{'Quality Score': edges_quality[i], 'Mean Quality': mean_quality_per_bin[i]} for i in range(len(mean_quality_per_bin))]
-
-            # Create the plot
+            # Line plot of quality scores
+            df_quality = df_stats.groupby(['sample_name', 'mean_quality']).size().reset_index(name='read_count')
             plt_quality = Plot()
-            plt_quality.xAxis = dict(name="Quality Score", type="category")
-            plt_quality.yAxis = dict(name="Number of Reads", type="value")
+            for sample_name in df_quality['sample_name'].unique():
+                barcode = df_quality[df_quality['sample_name'] == sample_name]
+                plt_quality.plot(barcode['mean_quality'], barcode['read_count'], marker='o', linestyle='-', label=sample_name)
 
-            # Add the dataset for the line plot
-            plt_quality.add_dataset(dict(line_data))
-
-            # Add the line series for mean quality per bin
-            plt_quality.add_series({
-                'type': 'line',
-                'name': 'Mean Quality per Bin',
-                'lineStyle': {'color': 'red', 'width': 2}
-            })
-
-            plt_quality.title = dict(
-                text='Read Quality',
-                subtext=(
-                    f"Mean: {round(df_stats['mean_quality'].mean())} "
-                    f"Median: {round(df_stats['mean_quality'].median())}"
-                ),
-                left='center',
-                padding=[10, 1, 1, 1]  # Add padding to avoid overlap
-            )
-            plt_quality.xAxis.update({'min': 0, 'max': 30, 'splitNumber': 6})
-
+            plt_quality.xlabel('Mean Quality')
+            plt_quality.ylabel('Number of Reads')
+            plt_quality.title('Number of Reads vs Mean Quality')
+            plt_quality.legend(title='Sample Name')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
