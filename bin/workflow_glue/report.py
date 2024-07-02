@@ -239,7 +239,7 @@ def plot_read_summary(report, stats):
             # Line graph of base yield
             combined_df = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="int")
+                length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="float")
                 cumsum = np.cumsum(length[::-1])[::-1]
                 df_yield = pd.DataFrame({
                     'Read Length / kb': length,
