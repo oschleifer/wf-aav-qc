@@ -206,6 +206,7 @@ def plot_read_summary(report, stats):
 
             # Line plot of read length
             df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
+            df_length['binned_length'] = df_length['binned_length'].astype(str)
 
             combined_length = pd.DataFrame()
             for sample_name in df_length['sample_name'].unique():
