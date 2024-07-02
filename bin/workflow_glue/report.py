@@ -190,9 +190,12 @@ def plot_read_summary(report, stats):
             plt_quality = Plot()
             plt_quality.xAxis = dict(name="Quality Score", type="category")
             plt_quality.yAxis = dict(name="Number of Reads", type="value")
+            
+            # Convert dataset to the correct format
+            dataset = [{'Quality Score': row['Quality Score'], 'Number of Reads': row['Number of Reads']} for _, row in combined_qual.iterrows()]
 
             # Add the dataset for the bar plot
-            plt_quality.dataset = combined_qual.to_dict('records')
+            plt_quality.dataset = dataset
 
             # Add the bar plot series
             plt_quality.add_series({
