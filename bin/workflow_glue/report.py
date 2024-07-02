@@ -167,15 +167,18 @@ def plot_read_summary(report, stats):
         with Grid(columns=3):
             # Line plot of quality scores
             df_quality = df_stats.groupby(['sample_name', 'mean_quality']).size().reset_index(name='read_count')
-            plt_quality = Plot()
+            combined_qstats = pd.DataFrame()
             for sample_name in df_quality['sample_name'].unique():
                 barcode = df_quality[df_quality['sample_name'] == sample_name]
-                plt_quality.plot(barcode['mean_quality'], barcode['read_count'], marker='o', linestyle='-', label=sample_name)
+                combined_qstats = pd.concat([combined_qstats, barcode], ignore_index = True)
 
-            plt_quality.xlabel('Mean Quality')
-            plt_quality.ylabel('Number of Reads')
-            plt_quality.title('Number of Reads vs Mean Quality')
-            plt_quality.legend(title='Sample Name')
+            plt_quality = ezc.lineplot(
+                data=combined_qstats, hue='sample_name',
+                x='mean_quality', y='read_count'
+            )
+            plt_quality.title = dict(
+                text="Read Quality"
+            )
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
