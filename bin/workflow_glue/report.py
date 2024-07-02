@@ -185,12 +185,37 @@ def plot_read_summary(report, stats):
             
             # Average mean quality per bin across all samples
             mean_quality_per_bin = np.nanmean(mean_quality_per_bin, axis=0)
+
+            # Create the plot
+            plt_quality = Plot()
+            plt_quality.xAxis = dict(name="Quality Score", type="category")
+            plt_quality.yAxis = dict(name="Number of Reads", type="value")
+
+            # Add the dataset for the bar plot
+            plt_quality.dataset = combined_qual.to_dict('records')
+
+            # Add the bar plot series
+            plt_quality.add_series({
+                'type': 'bar',
+                'name': 'Number of Reads',
+                'encode': {
+                    'x': 'Quality Score',
+                    'y': 'Number of Reads',
+                    'tooltip': ['Quality Score', 'Number of Reads']
+                }
+            })
+
+            # Prepare the line series data
+            line_data = [{'value': [edges_quality[i], mean_quality_per_bin[i]]} for i in range(len(mean_quality_per_bin))]
+
+            # Add the line series for mean quality per bin
+            plt_quality.add_series({
+                'type': 'line',
+                'name': 'Mean Quality per Bin',
+                'data': line_data,
+                'lineStyle': {'color': 'red', 'width': 2}
+            })
           
-            plt_quality = ezc.barplot(
-                combined_qual, 
-                x='Quality Score', y='Number of Reads',
-                hue='Barcode', group='Quality Score'
-            )
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
@@ -200,19 +225,8 @@ def plot_read_summary(report, stats):
                 left='center',
                 padding=[10, 1, 1, 1]  # Add padding to avoid overlap
             )
-            for series in plt_quality.series:
-                series.showSymbol = False
-            plt_quality.xAxis.min = 0
-            plt_quality.xAxis.max = 30
-            plt_quality.xAxis.splitNumber = 6
+            plt_quality.xAxis.update({'min': 0, 'max': 30, 'splitNumber': 6})
 
-            line_data = list(zip(edges_quality[:-1], mean_quality_per_bin))
-            plt_quality.add_series({
-                'type': 'line',
-                'name': 'Mean Quality per Bin',
-                'data': line_data,
-                'lineStyle': {'color':'red', 'width':2}
-            })
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
