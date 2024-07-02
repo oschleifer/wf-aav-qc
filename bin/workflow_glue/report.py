@@ -206,10 +206,13 @@ def plot_read_summary(report, stats):
             plt_quality.xAxis.max = 30
             plt_quality.xAxis.splitNumber = 6
 
-            plt_quality.add_series(
-                type='line',
-                data=list(zip(edges_quality[:-1], mean_quality_per_bin))
-            )
+            line_data = list(zip(edges_quality[:-1], mean_quality_per_bin))
+            plt_quality.add_series({
+                'type': 'line',
+                'name': 'Mean Quality per Bin',
+                'data': line_data,
+                'lineStyle': {'color':'red', 'width':2}
+            })
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
