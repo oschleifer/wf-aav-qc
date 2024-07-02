@@ -185,37 +185,24 @@ def plot_read_summary(report, stats):
             
             # Average mean quality per bin across all samples
             mean_quality_per_bin = np.nanmean(mean_quality_per_bin, axis=0)
+            line_data = [{'Quality Score': edges_quality[i], 'Mean Quality': mean_quality_per_bin[i]} for i in range(len(mean_quality_per_bin))]
 
             # Create the plot
             plt_quality = Plot()
             plt_quality.xAxis = dict(name="Quality Score", type="category")
             plt_quality.yAxis = dict(name="Number of Reads", type="value")
             
-            # Convert dataset to the correct format
-            dataset = [{'Quality Score': row['Quality Score'], 'Number of Reads': row['Number of Reads']} for _, row in combined_qual.iterrows()]
-
-            # Add the dataset for the bar plot
-            plt_quality.dataset = dataset
-
-            # Add the bar plot series
-            plt_quality.add_series({
-                'type': 'bar',
-                'name': 'Number of Reads',
-                'encode': {
-                    'x': 'Quality Score',
-                    'y': 'Number of Reads',
-                    'tooltip': ['Quality Score', 'Number of Reads']
-                }
-            })
-
-            # Prepare the line series data
-            line_data = [{'value': [edges_quality[i], mean_quality_per_bin[i]]} for i in range(len(mean_quality_per_bin))]
+             # Add the dataset for the line plot
+            plt_quality.add_dataset(line_data)
 
             # Add the line series for mean quality per bin
             plt_quality.add_series({
                 'type': 'line',
                 'name': 'Mean Quality per Bin',
-                'data': line_data,
+                'encode': {
+                    'x': 'Quality Score',
+                    'y': 'Mean Quality'
+                },
                 'lineStyle': {'color': 'red', 'width': 2}
             })
           
