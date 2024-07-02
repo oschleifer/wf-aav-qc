@@ -185,7 +185,7 @@ def plot_read_summary(report, stats):
 
             # Average mean quality per bin across all samples
             mean_quality_per_bin = np.nanmean(mean_quality_per_bin, axis=0)
-            line_data = [{'Quality Score': edges_quality[i], 'Mean Quality': mean_quality_per_bin[i]} for i in range(len(mean_quality_per_bin))]
+            line_data = [{'Mean Quality': mean_quality_per_bin[i]} for i in range(len(mean_quality_per_bin))]
 
             # Create the plot
             plt_quality = Plot()
