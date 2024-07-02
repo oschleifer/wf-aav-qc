@@ -147,7 +147,7 @@ def plot_contamination(report, class_counts):
             plt_alns.title = dict(text='Alignment counts per target')
             plt_alns.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_alns, theme='epi2melabs', height='400px')
-            
+
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
     df_stats = pd.read_csv(
@@ -199,10 +199,6 @@ def plot_read_summary(report, stats):
             plt_quality.add_series({
                 'type': 'line',
                 'name': 'Mean Quality per Bin',
-                'encode': {
-                    'x': 'Quality Score',
-                    'y': 'Mean Quality'
-                },
                 'lineStyle': {'color': 'red', 'width': 2}
             })
 
