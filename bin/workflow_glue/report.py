@@ -207,7 +207,6 @@ def plot_read_summary(report, stats):
             plt_quality.xAxis.splitNumber = 6
 
             plt_quality.add_series(
-                name='Mean Quality per Bin',
                 type='line',
                 data=list(zip(edges_quality[:-1], mean_quality_per_bin))
             )
