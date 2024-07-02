@@ -163,8 +163,11 @@ def plot_read_summary(report, stats):
             'read_number': np.uint32
         })
     
-    bins = np.arange(0, df_stats['mean_quality'].max() + 1, 1)
-    df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], bins)
+    qbins = np.arange(0, df_stats['mean_quality'].max() + 1, 1)
+    lbins = np.arange(0, df_stats['read_length'].max() + 1000, 1000)
+    df_stats['read_length'] = df_stats['read_length'] / 1000
+    df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], qbins)
+    df_stats['binned_length'] = pd.cut(df_stats['read_length'], lbins)
 
     with report.add_section("Read Summary", "Read Summary"):
         with Grid(columns=3):
@@ -187,40 +190,45 @@ def plot_read_summary(report, stats):
                 data=combined_qstats, hue='Barcode',
                 x='Quality Score', y='Number of Reads'
             )
+            for series in plt_quality.series:
+                series.showSymbol = False
             plt_quality.title = dict(
-                text="Read Quality"
+                text="Read Quality",
+                subtext=(
+                    f"Mean: {round(df_stats['mean_quality'].mean())} "
+                    f"Median: {round(df_stats['mean_quality'].median())} "
+                )
             )
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
-            # Line plot of read lengths
-            combined_lengths = pd.DataFrame()
-            for sample_name, df_sample in df_stats.groupby('sample_name'):
-                read_len = np.sort(df_sample["read_length"] / 1000)
-                cum_reads = np.arange(1, len(read_len) + 1)
-                df_length = pd.DataFrame({
-                    'Read Length / kb': read_len,
-                    'Number of Reads': cum_reads,
-                    'Barcode': sample_name
-                })
-                combined_lengths = pd.concat([combined_lengths, df_length], ignore_index=True)
+            # Line plot of read length
+            df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
+            df_length['binned_length'] = df_quality['binned_length'].astype(str)
+
+            combined_length = pd.DataFrame()
+            for sample_name in df_length['sample_name'].unique():
+                barcode = df_length[df_length['sample_name'] == sample_name]
+                combined_length = pd.concat([combined_length, barcode], ignore_index = True)
+
+            combined_length = combined_length.rename(columns={
+                'sample_name': 'Barcode',
+                'binned_length': 'Read Length / kb',
+                'read_l_count': 'Number of Reads'
+            })
+
             plt_length = ezc.lineplot(
-                combined_lengths,
-                x='Read Length / kb', y='Number of Reads',
-                hue='Barcode', group='Read Length / kb'
+                data=combined_length, hue='Barcode',
+                x='Read Length / kb', y='Number of Reads'
             )
             for series in plt_length.series:
                 series.showSymbol = False
             plt_length.title = dict(
-                text='Read Length',
+                text="Read Length",
                 subtext=(
                     f"Mean: {round(df_stats['read_length'].mean())} "
                     f"Median: {round(df_stats['read_length'].median())} "
-                    f"Min: {round(df_stats['read_length'].min())} "
-                    f"Max: {round(df_stats['read_length'].max())}"
-                ),
+                )
             )
-            plt_length.xAxis.min = 0
-            plt_length.xAxis.max = max(df_stats['read_length']) / 1000
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
