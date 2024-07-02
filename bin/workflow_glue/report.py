@@ -177,7 +177,7 @@ def plot_read_summary(report, stats):
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
                 bin_means = [
-                    df_sample['mean_quality'(df_sample['mean_quality'] >= edges_quality[i]) & 
+                    df_sample[(df_sample['mean_quality'] >= edges_quality[i]) & 
                         (df_sample['mean_quality'] < edges_quality[i+1])
                     ]['mean_quality'].mean() for i in range(len(edges_quality) - 1)
                 ]
