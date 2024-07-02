@@ -163,7 +163,7 @@ def plot_read_summary(report, stats):
             'read_number': np.uint32
         })
     
-    qbins = np.arange(0, df_stats['mean_quality'].max() + 1, 0,1)
+    qbins = np.arange(0, df_stats['mean_quality'].max() + 1, 0.1)
     df_stats['read_length'] = df_stats['read_length'] / 1000
     lbins = np.arange(0, df_stats['read_length'].max() + 1, 0.2)
     df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], qbins)
