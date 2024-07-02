@@ -163,9 +163,9 @@ def plot_read_summary(report, stats):
             'read_number': np.uint32
         })
     
-    qbins = np.arange(0, df_stats['mean_quality'].max() + 1, 1)
-    lbins = np.arange(0, df_stats['read_length'].max() + 1000, 1000)
+    qbins = np.arange(0, df_stats['mean_quality'].max() + 1, 0,1)
     df_stats['read_length'] = df_stats['read_length'] / 1000
+    lbins = np.arange(0, df_stats['read_length'].max() + 1, 0.2)
     df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], qbins)
     df_stats['binned_length'] = pd.cut(df_stats['read_length'], lbins)
 
@@ -199,11 +199,13 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
+            plt_quality.xAxis.min = 0
+            plt_quality.xAxis.max = 30
+            plt_quality.xAxis.splitNumber = 6
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read length
             df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
-            df_length['binned_length'] = df_quality['binned_length'].astype(str)
 
             combined_length = pd.DataFrame()
             for sample_name in df_length['sample_name'].unique():
@@ -229,6 +231,8 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['read_length'].median())} "
                 )
             )
+            plt_length.xAxis.min = 0
+            plt_length.xAxis.max = max(df_stats['read_length'])
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
@@ -237,7 +241,7 @@ def plot_read_summary(report, stats):
                 length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="int")
                 cumsum = np.cumsum(length[::-1])[::-1]
                 df_yield = pd.DataFrame({
-                    'Read Length / kb': length / 1000,
+                    'Read Length / kb': length,
                     'Yield above length / Gbases': cumsum / 1e9,
                     'Barcode': sample_name
                 })
