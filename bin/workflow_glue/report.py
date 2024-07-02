@@ -147,7 +147,7 @@ def plot_contamination(report, class_counts):
             plt_alns.title = dict(text='Alignment counts per target')
             plt_alns.xAxis.axisLabel = dict(rotate=45)
             EZChart(plt_alns, theme='epi2melabs', height='400px')
-
+            
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
     df_stats = pd.read_csv(
@@ -157,12 +157,12 @@ def plot_read_summary(report, stats):
             'read_id': str,
             'filename': str,
             'sample_name': str,
-            'read_length':np.uint32,
+            'read_length': np.uint32,
             'mean_quality': np.float32,
             'channel': np.uint32,
             'read_number': np.uint32
         })
-    
+
     with report.add_section("Read Summary", "Read Summary"):
         with Grid(columns=3):
             # Line plot of read quality
@@ -177,12 +177,12 @@ def plot_read_summary(report, stats):
                 })
                 combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
                 bin_means = [
-                    df_sample[(df_sample['mean_quality'] >= edges_quality[i]) & 
-                        (df_sample['mean_quality'] < edges_quality[i+1])
-                    ]['mean_quality'].mean() for i in range(len(edges_quality) - 1)
+                    df_sample[(df_sample['mean_quality'] >= edges_quality[i]) &
+                              (df_sample['mean_quality'] < edges_quality[i + 1])
+                             ]['mean_quality'].mean() for i in range(len(edges_quality) - 1)
                 ]
                 mean_quality_per_bin.append(bin_means)
-            
+
             # Average mean quality per bin across all samples
             mean_quality_per_bin = np.nanmean(mean_quality_per_bin, axis=0)
             line_data = [{'Quality Score': edges_quality[i], 'Mean Quality': mean_quality_per_bin[i]} for i in range(len(mean_quality_per_bin))]
@@ -191,8 +191,8 @@ def plot_read_summary(report, stats):
             plt_quality = Plot()
             plt_quality.xAxis = dict(name="Quality Score", type="category")
             plt_quality.yAxis = dict(name="Number of Reads", type="value")
-            
-             # Add the dataset for the line plot
+
+            # Add the dataset for the line plot
             plt_quality.add_dataset(line_data)
 
             # Add the line series for mean quality per bin
@@ -205,7 +205,7 @@ def plot_read_summary(report, stats):
                 },
                 'lineStyle': {'color': 'red', 'width': 2}
             })
-          
+
             plt_quality.title = dict(
                 text='Read Quality',
                 subtext=(
@@ -222,7 +222,7 @@ def plot_read_summary(report, stats):
             # Line plot of read lengths
             combined_lengths = pd.DataFrame()
             for sample_name, df_sample in df_stats.groupby('sample_name'):
-                read_len = np.sort(df_sample["read_length"]/1000)
+                read_len = np.sort(df_sample["read_length"] / 1000)
                 cum_reads = np.arange(1, len(read_len) + 1)
                 df_length = pd.DataFrame({
                     'Read Length / kb': read_len,
@@ -241,8 +241,8 @@ def plot_read_summary(report, stats):
                 text='Read Length',
                 subtext=(
                     f"Mean: {round(df_stats['read_length'].mean())} "
-                    f"Median: {round(df_stats['read_length'].median())}"
-                    f"Min: {round(df_stats['read_length'].min())}"
+                    f"Median: {round(df_stats['read_length'].median())} "
+                    f"Min: {round(df_stats['read_length'].min())} "
                     f"Max: {round(df_stats['read_length'].max())}"
                 ),
             )
@@ -252,12 +252,11 @@ def plot_read_summary(report, stats):
 
             # Line graph of base yield
             combined_df = pd.DataFrame()
-
             for sample_name, df_sample in df_stats.groupby('sample_name'):
                 length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="int")
                 cumsum = np.cumsum(length[::-1])[::-1]
                 df_yield = pd.DataFrame({
-                    'Read Length / kb': length / 1000, 
+                    'Read Length / kb': length / 1000,
                     'Yield above length / Gbases': cumsum / 1e9,
                     'Barcode': sample_name
                 })
