@@ -164,63 +164,54 @@ def plot_read_summary(report, stats):
         })
     
     with report.add_section("Read Summary", "Read Summary"):
-        with Grid(columns=4):
-            max_length = df_stats['read_length'].max()
-            bins = np.arange(0, max_length + 50, 50)
-            df_stats['bins'] = pd.cut(df_stats['read_length'], bins=bins,right=False)
-            mean_read = df_stats.groupby('bins')['read_length'].mean().reset_index()
-            mean_read['bin_mid'] = mean_read['bins'].apply(lambda x: x.left + 50 / 2)
-            df_len = mean_read[['bin_mid', 'read_length']].rename(columns={'bin_mid': 'Bin Midpoint (bp)', 'read_length': 'Mean Read Length (bp)'})
-
-            # Create the line plot with EZChart
-            plt_mean_read_length = ezc.lineplot(
-                data=df_len,
-                x='Bin Midpoint (bp)',
-                y='Mean Read Length (bp)'
-            )
-
-            # Customize the plot if necessary
-            plt_mean_read_length.title = dict(
-                text="Mean Read Length in Bins of 50",
-            )
-            for series in plt_mean_read_length.series:
-                series.showSymbol = True  # Show symbols for each data point
-
-            # Display the plot
-            EZChart(plt_mean_read_length, theme='epi2melabs', height='400px')
-
+        with Grid(columns=3):
             # Line plot of read quality
-            # combined_qual = pd.DataFrame()
-            # for sample_name, df_sample in df_stats.groupby('sample_name'):
-            #     qual_score = np.sort(df_sample["mean_quality"])
-            #     cum_reads = np.arange(1, len(qual_score)+1)
-            #     df_quality = pd.DataFrame({
-            #         'Quality Score': qual_score,
-            #         'Number of Reads': cum_reads,
-            #         'Barcode': sample_name
-            #     })
-            #     combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
+            combined_qual = pd.DataFrame()
+            mean_quality_per_bin = []
+            for sample_name, df_sample in df_stats.groupby('sample_name'):
+                hist_quality, edges_quality = np.histogram(df_sample['mean_quality'], bins=50)
+                df_quality = pd.DataFrame({
+                    'Quality Score': edges_quality[:-1],
+                    'Number of Reads': hist_quality,
+                    'Barcode': sample_name
+                })
+                combined_qual = pd.concat([combined_qual, df_quality], ignore_index=True)
+                bin_means = [
+                    df_sample['mean_quality'(df_sample['mean_quality'] >= edges_quality[i]) & 
+                        (df_sample['mean_quality'] < edges_quality[i+1])
+                    ]['mean_quality'].mean() for i in range(len(edges_quality) - 1)
+                ]
+                mean_quality_per_bin.append(bin_means)
             
-            # plt_quality = ezc.barplot(
-            #     combined_qual, 
-            #     x='Quality Score', y='Number of Reads',
-            #     hue='Barcode', group='Quality Score'
-            # )
-            # plt_quality.title = dict(
-            #     text='Read Quality',
-            #     subtext=(
-            #         f"Mean: {round(df_stats['mean_quality'].mean())} "
-            #         f"Median: {round(df_stats['mean_quality'].median())}"
-            #     ),
-            #     left='center',
-            #     padding=[10, 1, 1, 1]  # Add padding to avoid overlap
-            # )
-            # for series in plt_quality.series:
-            #     series.showSymbol = False
-            # plt_quality.xAxis.min = 0
-            # plt_quality.xAxis.max = 30
-            # plt_quality.xAxis.splitNumber = 6
-            # EZChart(plt_quality, theme='epi2melabs', height='400px')
+            # Average mean quality per bin across all samples
+            mean_quality_per_bin = np.nanmean(mean_quality_per_bin, axis=0)
+          
+            plt_quality = ezc.barplot(
+                combined_qual, 
+                x='Quality Score', y='Number of Reads',
+                hue='Barcode', group='Quality Score'
+            )
+            plt_quality.title = dict(
+                text='Read Quality',
+                subtext=(
+                    f"Mean: {round(df_stats['mean_quality'].mean())} "
+                    f"Median: {round(df_stats['mean_quality'].median())}"
+                ),
+                left='center',
+                padding=[10, 1, 1, 1]  # Add padding to avoid overlap
+            )
+            for series in plt_quality.series:
+                series.showSymbol = False
+            plt_quality.xAxis.min = 0
+            plt_quality.xAxis.max = 30
+            plt_quality.xAxis.splitNumber = 6
+
+            plt_quality.add_series(
+                name='Mean Quality per Bin',
+                type='line',
+                data=list(zip(edges_quality[:-1], mean_quality_per_bin))
+            )
+            EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read lengths
             combined_lengths = pd.DataFrame()
