@@ -170,7 +170,7 @@ def plot_read_summary(report, stats):
     df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], qbins)
     df_stats['binned_length'] = pd.cut(df_stats['read_length'], lbins)
 
-    with report.add_section("Read Summary", "Read Summary"):
+    with report.add_section("Read summary", "Read summary"):
         with Grid(columns=3):
             # Line plot of quality scores
             df_quality = df_stats.groupby(['sample_name', 'binned_quality']).size().reset_index(name='read_count')
@@ -183,19 +183,19 @@ def plot_read_summary(report, stats):
 
             combined_qstats = combined_qstats.rename(columns={
                 'sample_name': 'Barcode',
-                'binned_quality': 'Quality Score',
-                'read_count': 'Number of Reads'
+                'binned_quality': 'Quality score',
+                'read_count': 'Number of reads'
             })
 
             plt_quality = ezc.lineplot(
                 data=combined_qstats, hue='Barcode',
-                x='Quality Score', y='Number of Reads'
+                x='Quality score', y='Number of reads'
             )
             for series in plt_quality.series:
                 series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_quality.title = dict(
-                text="Read Quality",
+                text="Read quality",
                 subtext=(
                     f"Mean: {round(df_stats['mean_quality'].mean(), 1)} "
                     f"Median: {round(df_stats['mean_quality'].median())} "
@@ -205,6 +205,9 @@ def plot_read_summary(report, stats):
             plt_quality.xAxis.max = 30
             # plt_quality.xAxis.splitNumber = 6
             plt_quality.xAxis.interval = 5
+            plt_quality.xAxis.axisLabel = {
+                    'formatter': lambda x: f"{int(x)}" if x % 5 == 0 else ""
+                }
             plt_quality.legend = dict(orient='horizontal', right='right', top=40, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
@@ -219,19 +222,19 @@ def plot_read_summary(report, stats):
 
             combined_length = combined_length.rename(columns={
                 'sample_name': 'Barcode',
-                'binned_length': 'Read Length / kb',
-                'read_l_count': 'Number of Reads'
+                'binned_length': 'Read length / kb',
+                'read_l_count': 'Number of reads'
             })
 
             plt_length = ezc.lineplot(
                 data=combined_length, hue='Barcode',
-                x='Read Length / kb', y='Number of Reads'
+                x='Read length / kb', y='Number of reads'
             )
             for series in plt_length.series:
                 series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_length.title = dict(
-                text="Read Length",
+                text="Read length",
                 subtext=(
                     f"Mean: {round(df_stats['read_length'].mean()*1000)} "
                     f"Median: {round(df_stats['read_length'].median()*1000)} "
@@ -250,7 +253,7 @@ def plot_read_summary(report, stats):
                 length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="float")
                 cumsum = np.cumsum(length[::-1])[::-1]
                 df_yield = pd.DataFrame({
-                    'Read Length / kb': length,
+                    'Read length / kb': length,
                     'Yield above length / Gbases': cumsum / 1e9,
                     'Barcode': sample_name
                 })
@@ -261,7 +264,7 @@ def plot_read_summary(report, stats):
             # Plot combined data
             plt_yield = ezc.lineplot(
                 data=combined_yield, hue='Barcode', alpha=.5,
-                x='Read Length / kb', y='Yield above length / Gbases'
+                x='Read length / kb', y='Yield above length / Gbases'
             )
             for series in plt_yield.series:
                 series.lineStyle = {'opacity': 0.8}
@@ -270,7 +273,7 @@ def plot_read_summary(report, stats):
                 text="Base yield above read length",
                 padding=[5, 5, 5, 5]
             )
-            plt_yield.legend = dict(orient='horizontal', top=30, icon='rect')
+            plt_yield.legend = dict(orient='horizontal', right='right', top=30, icon='rect')
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
