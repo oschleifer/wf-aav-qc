@@ -200,8 +200,9 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
-            plt_quality.legend = dict(orient='horizontal', top=40, icon='rect')
-            EZChart(plt_quality, theme='epi2melabs', height='500px')
+            plt_quality.xAxis.update({'min': 0, 'max': 30, 'splitNumber': 6})
+            plt_quality.legend = dict(orient='horizontal', right='center', top=40, icon='rect')
+            EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read length
             df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
@@ -234,8 +235,9 @@ def plot_read_summary(report, stats):
                     f"Max: {round(df_stats['read_length'].max()*1000)} "
                 )
             )
+            plt_length.xlim(0, max(df_stats['read_length']), 2)
             plt_length.legend = dict(orient='horizontal', top=40, icon='rect')
-            EZChart(plt_length, theme='epi2melabs', height='500px')
+            EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
             combined_yield = pd.DataFrame()
@@ -263,7 +265,7 @@ def plot_read_summary(report, stats):
                 padding=[5,5,5,5]
             )
             plt_yield.legend = dict(orient='horizontal', top=40, icon='rect')
-            EZChart(plt_yield, theme='epi2melabs', height='500px')
+            EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
     """Make report section barplots detailing the AAV structures found."""
