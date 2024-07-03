@@ -150,6 +150,7 @@ def plot_contamination(report, class_counts):
 
 def plot_read_summary(report, stats):
     """Make report section barplots detailing the read quality, read length, and base yield."""
+    
     df_stats = pd.read_csv(
         stats,
         sep='\t',
@@ -178,7 +179,7 @@ def plot_read_summary(report, stats):
             combined_qstats = pd.DataFrame()
             for sample_name in df_quality['sample_name'].unique():
                 barcode = df_quality[df_quality['sample_name'] == sample_name]
-                combined_qstats = pd.concat([combined_qstats, barcode], ignore_index = True)
+                combined_qstats = pd.concat([combined_qstats, barcode], ignore_index=True)
 
             combined_qstats = combined_qstats.rename(columns={
                 'sample_name': 'Barcode',
@@ -202,8 +203,9 @@ def plot_read_summary(report, stats):
             )
             plt_quality.xAxis.min = 0
             plt_quality.xAxis.max = 30
-            plt_quality.xAxis.splitNumber = 6
-            plt_quality.legend = dict(orient='horizontal', right='center', top=40, icon='rect')
+            # plt_quality.xAxis.splitNumber = 6
+            plt_quality.xAxis.interval = 5
+            plt_quality.legend = dict(orient='horizontal', right='right', top=40, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read length
@@ -213,7 +215,7 @@ def plot_read_summary(report, stats):
             combined_length = pd.DataFrame()
             for sample_name in df_length['sample_name'].unique():
                 barcode = df_length[df_length['sample_name'] == sample_name]
-                combined_length = pd.concat([combined_length, barcode], ignore_index = True)
+                combined_length = pd.concat([combined_length, barcode], ignore_index=True)
 
             combined_length = combined_length.rename(columns={
                 'sample_name': 'Barcode',
@@ -239,7 +241,7 @@ def plot_read_summary(report, stats):
             )
             plt_length.xAxis.min = 0
             plt_length.xAxis.max = max(df_stats['read_length'])
-            plt_length.legend = dict(orient='horizontal', top=40, icon='rect')
+            plt_length.legend = dict(orient='vertical', right='right', top=40, icon='rect')
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
@@ -253,21 +255,22 @@ def plot_read_summary(report, stats):
                     'Barcode': sample_name
                 })
 
-                # add barcode to combined DataFrame
+                # Add barcode to combined DataFrame
                 combined_yield = pd.concat([combined_yield, df_yield], ignore_index=True)
 
             # Plot combined data
             plt_yield = ezc.lineplot(
                 data=combined_yield, hue='Barcode', alpha=.5,
-                x='Read Length / kb', y='Yield above length / Gbases')
+                x='Read Length / kb', y='Yield above length / Gbases'
+            )
             for series in plt_yield.series:
                 series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_yield.title = dict(
                 text="Base yield above read length",
-                padding=[5,5,5,5]
+                padding=[5, 5, 5, 5]
             )
-            plt_yield.legend = dict(orient='horizontal', top=40, icon='rect')
+            plt_yield.legend = dict(orient='horizontal', top=30, icon='rect')
             EZChart(plt_yield, theme='epi2melabs', height='400px')
 
 def plot_aav_structures(report, structures_file):
