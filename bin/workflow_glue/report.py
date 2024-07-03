@@ -190,7 +190,7 @@ def plot_read_summary(report, stats):
             })
 
             plt.figure(figsize=(12, 6))
-            ax_quality = sns.lineplot(data=combined_qstats, hue='Barcode', x='Quality Score', y='Number of Reads')
+            ax_quality = sns.lineplot(data=combined_qstats, hue='Barcode', x='Quality score', y='Number of reads')
             ax_quality.set_title(
                 f"Read quality\nMean: {round(df_stats['mean_quality'].mean(), 1)} "
                 f"Median: {round(df_stats['mean_quality'].median())} "
@@ -203,9 +203,10 @@ def plot_read_summary(report, stats):
             plt.tight_layout()
             EZChart(plt, theme='epi2melabs', height='400px')
 
-# Line plot of read length
+            # Line plot of read length
             df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
             df_length['binned_length'] = df_length['binned_length'].astype(str)
+            df_length['binned_length'] = df_length['binned_length'].apply(lambda x: float(x.split(",")[0][1:]))
 
             combined_length = pd.DataFrame()
             for sample_name in df_length['sample_name'].unique():
