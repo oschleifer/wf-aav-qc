@@ -191,7 +191,7 @@ def plot_read_summary(report, stats):
                 x='Quality Score', y='Number of Reads'
             )
             for series in plt_quality.series:
-                series.lineStyle = {'opacity': 0.6}
+                series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_quality.title = dict(
                 text="Read Quality",
@@ -200,6 +200,9 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
+            plt_quality.xAxis.min = 0
+            plt_quality.xAxis.max = 30
+            plt_quality.xAxis.splitNumber = 6
             plt_quality.legend = dict(orient='horizontal', right='center', top=40, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
@@ -223,7 +226,7 @@ def plot_read_summary(report, stats):
                 x='Read Length / kb', y='Number of Reads'
             )
             for series in plt_length.series:
-                series.lineStyle = {'opacity': 0.6}
+                series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_length.title = dict(
                 text="Read Length",
@@ -234,7 +237,8 @@ def plot_read_summary(report, stats):
                     f"Max: {round(df_stats['read_length'].max()*1000)} "
                 )
             )
-            plt_length.xlim(0, max(df_stats['read_length']), 2)
+            plt_length.xAxis.min = 0
+            plt_length.xAxis.max = max(df_stats['read_length'])
             plt_length.legend = dict(orient='horizontal', top=40, icon='rect')
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
