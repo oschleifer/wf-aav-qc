@@ -177,6 +177,7 @@ def plot_read_summary(report, stats):
             # Line plot of quality scores
             df_quality = df_stats.groupby(['sample_name', 'binned_quality']).size().reset_index(name='read_count')
             df_quality['binned_quality'] = df_quality['binned_quality'].astype(str)
+            df_quality['binned_quality'] = df_quality['binned_quality'].apply(lambda x: float(x.split(",")[0][1:]))
 
             combined_qstats = pd.DataFrame()
             for sample_name in df_quality['sample_name'].unique():
