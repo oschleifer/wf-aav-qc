@@ -200,7 +200,9 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
-            plt_quality.xAxis = dict(type='value', min=0, max=30, splitNumber=6)
+            plt_quality.xAxis.min = dict(0)
+            plt_quality.xAxis.max = dict(30)
+            plt_quality.xAxis.splitNumber = dict(6)
             plt_quality.legend = dict(orient='horizontal', top=40, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='500px')
 
