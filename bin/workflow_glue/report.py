@@ -201,13 +201,14 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
-            plt_quality.xAxis.min = 0
-            plt_quality.xAxis.max = 30
-            # plt_quality.xAxis.splitNumber = 6
-            plt_quality.xAxis.interval = 5
-            plt_quality.xAxis.axisLabel = {
+            plt_quality.xAxis = {
+                'min': 0,
+                'max': 30,
+                'splitNumber': 6,
+                'axisLabel': {
                     'formatter': lambda x: f"{int(x)}" if x % 5 == 0 else ""
                 }
+            }
             plt_quality.legend = dict(orient='horizontal', right='right', top=40, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
