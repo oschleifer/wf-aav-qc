@@ -197,11 +197,13 @@ def plot_read_summary(report, stats):
                 subtext=(
                     f"Mean: {round(df_stats['mean_quality'].mean(), 1)} "
                     f"Median: {round(df_stats['mean_quality'].median())} "
-                )
+                ),
+                padding=[5,5,5,5]
             )
-            plt_quality.xAxis.min = 0
-            plt_quality.xAxis.max = 30
-            plt_quality.xAxis.splitNumber = 6
+            # plt_quality.xAxis.min = 0
+            # plt_quality.xAxis.max = 30
+            # plt_quality.xAxis.splitNumber = 6
+            plt_quality.set_xticks(range(0, 31, 5))
             plt_quality.legend = dict(orient='horizontal', top=20)
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
@@ -222,7 +224,7 @@ def plot_read_summary(report, stats):
 
             plt_length = ezc.lineplot(
                 data=combined_length, hue='Barcode',
-                x='Read Length / kb', y='Number of Reads', alpha=.5
+                x='Read Length / kb', y='Number of Reads', opacity=.4
             )
             for series in plt_length.series:
                 series.showSymbol = False
@@ -233,11 +235,13 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['read_length'].median()*1000)} "
                     f"Min: {round(df_stats['read_length'].min()*1000)} "
                     f"Max: {round(df_stats['read_length'].max()*1000)} "
-                )
+                ),
+                padding=[5,5,5,5]
             )
-            plt_length.xAxis.min = 0
-            plt_length.xAxis.max = max(df_stats['read_length'])
-            plt_length.xAxis.splitNumber = max(df_stats['read_length'])/2
+            # plt_length.xAxis.min = 0
+            # plt_length.xAxis.max = max(df_stats['read_length'])
+            # plt_length.xAxis.splitNumber = max(df_stats['read_length'])/2
+            plt_length.set_xticks(range(0, max(df_stats['read_length'], 2)))
             plt_length.legend = dict(orient='horizontal')
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
@@ -263,6 +267,7 @@ def plot_read_summary(report, stats):
                 series.showSymbol = False
             plt_yield.title = dict(
                 text="Base yield above read length",
+                padding=[5,5,5,5]
             )
             plt_yield.legend = dict(orient='horizontal')
             EZChart(plt_yield, theme='epi2melabs', height='400px')
