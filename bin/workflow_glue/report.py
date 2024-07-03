@@ -189,19 +189,22 @@ def plot_read_summary(report, stats):
                 'read_count': 'Number of reads'
             })
 
-            plt.figure(figsize=(12, 6))
-            ax_quality = sns.lineplot(data=combined_qstats, hue='Barcode', x='Quality score', y='Number of reads')
-            ax_quality.set_title(
-                f"Read quality\nMean: {round(df_stats['mean_quality'].mean(), 1)} "
-                f"Median: {round(df_stats['mean_quality'].median())} "
+            plt_quality = ezc.lineplot(
+                data=combined_qstats, hue='Barcode',
+                x='Quality score', y='Number of reads'
             )
-            ax_quality.set_xlim(0, 30)
-            ax_quality.set_xticks(np.arange(0, 31, 5))
-            ax_quality.set_xlabel('Quality score')
-            ax_quality.set_ylabel('Number of reads')
-            ax_quality.legend(title='Barcode', bbox_to_anchor=(1.05, 1), loc='upper right')
-            plt.tight_layout()
-            EZChart(plt, theme='epi2melabs', height='400px')
+            for series in plt_quality.series:
+                series.lineStyle = {'opacity': 0.8}
+                series.showSymbol = False
+            plt_quality.title = dict(
+                text="Read quality",
+                subtext=(
+                    f"Mean: {round(df_stats['mean_quality'].mean(), 1)} "
+                    f"Median: {round(df_stats['mean_quality'].median())} "
+                )
+            )
+            plt_quality.legend = dict(orient='horizontal', right='right', top=40, icon='rect')
+            EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read length
             df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
@@ -256,15 +259,14 @@ def plot_read_summary(report, stats):
 
             # Plot combined data
             plt_yield = ezc.lineplot(
-                data=combined_yield, hue='Barcode', alpha=.5,
+                data=combined_yield, hue='Barcode', 
                 x='Read length / kb', y='Yield above length / Gbases'
             )
             for series in plt_yield.series:
                 series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_yield.title = dict(
-                text="Base yield above read length",
-                padding=[5, 5, 5, 5]
+                text="Base yield above read length"
             )
             plt_yield.legend = dict(orient='horizontal', right='right', top=30, icon='rect')
             EZChart(plt_yield, theme='epi2melabs', height='400px')
