@@ -188,23 +188,20 @@ def plot_read_summary(report, stats):
 
             plt_quality = ezc.lineplot(
                 data=combined_qstats, hue='Barcode',
-                x='Quality Score', y='Number of Reads', alpha=.5
+                x='Quality Score', y='Number of Reads'
             )
             for series in plt_quality.series:
-                series.lineStyle = {'opacity':0.4}
+                series.lineStyle = {'opacity': 0.5}
                 series.showSymbol = False
             plt_quality.title = dict(
                 text="Read Quality",
                 subtext=(
                     f"Mean: {round(df_stats['mean_quality'].mean(), 1)} "
                     f"Median: {round(df_stats['mean_quality'].median())} "
-                ),
-                padding=[5,5,5,5]
+                )
             )
-            plt_quality.xAxis.min = 0
-            plt_quality.xAxis.max = 30
-            plt_quality.xAxis.splitNumber = 6
-            plt_quality.legend = dict(orient='horizontal', top=20)
+            plt_quality.xAxis = dict(min=0, max=30, splitNumber=6)
+            plt_quality.legend = dict(orient='horizontal', top=5, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='400px')
 
             # Line plot of read length
@@ -224,9 +221,10 @@ def plot_read_summary(report, stats):
 
             plt_length = ezc.lineplot(
                 data=combined_length, hue='Barcode',
-                x='Read Length / kb', y='Number of Reads', opacity=.4
+                x='Read Length / kb', y='Number of Reads'
             )
             for series in plt_length.series:
+                series.lineStyle = {'opacity': 0.5}
                 series.showSymbol = False
             plt_length.title = dict(
                 text="Read Length",
@@ -235,13 +233,12 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['read_length'].median()*1000)} "
                     f"Min: {round(df_stats['read_length'].min()*1000)} "
                     f"Max: {round(df_stats['read_length'].max()*1000)} "
-                ),
-                padding=[5,5,5,5]
+                )
             )
             plt_length.xAxis.min = 0
             plt_length.xAxis.max = max(df_stats['read_length'])
             plt_length.xAxis.splitNumber = max(df_stats['read_length'])/2
-            plt_length.legend = dict(orient='horizontal')
+            plt_length.legend = dict(orient='horizontal', top=30, icon='rect')
             EZChart(plt_length, theme='epi2melabs', height='400px')
 
             # Line graph of base yield
