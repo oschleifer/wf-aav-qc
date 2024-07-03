@@ -165,7 +165,7 @@ def plot_read_summary(report, stats):
     
     qbins = np.arange(0, df_stats['mean_quality'].max() + 1, 0.2)
     df_stats['read_length'] = df_stats['read_length'] / 1000
-    lbins = np.arange(0, df_stats['read_length'].max() + 1, 0.05)
+    lbins = np.arange(0, df_stats['read_length'].max() + 1, 0.08)
     df_stats['binned_quality'] = pd.cut(df_stats['mean_quality'], qbins)
     df_stats['binned_length'] = pd.cut(df_stats['read_length'], lbins)
 
@@ -200,7 +200,7 @@ def plot_read_summary(report, stats):
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
-            plt_quality.xAxis = dict('Quality Score', min=0, max=30, splitNumber=6)
+            plt_quality.xAxis = dict(type='value', min=0, max=30, splitNumber=6)
             plt_quality.legend = dict(orient='horizontal', top=40, icon='rect')
             EZChart(plt_quality, theme='epi2melabs', height='500px')
 
@@ -257,6 +257,7 @@ def plot_read_summary(report, stats):
                 data=combined_yield, hue='Barcode', alpha=.5,
                 x='Read Length / kb', y='Yield above length / Gbases')
             for series in plt_yield.series:
+                series.lineStyle = {'opacity': 0.8}
                 series.showSymbol = False
             plt_yield.title = dict(
                 text="Base yield above read length",
