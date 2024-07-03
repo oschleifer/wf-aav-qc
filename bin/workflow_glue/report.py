@@ -9,6 +9,8 @@ from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
 from ezcharts.layout.snippets.table import DataTable
+import matplotlib.pyplot as plt
+import seaborn as sns
 import sigfig
 import numpy as np
 import pandas as pd
@@ -187,29 +189,21 @@ def plot_read_summary(report, stats):
                 'read_count': 'Number of reads'
             })
 
-            plt_quality = ezc.lineplot(
-                data=combined_qstats, hue='Barcode',
-                x='Quality score', y='Number of reads'
+            plt.figure(figsize=(12, 6))
+            ax_quality = sns.lineplot(data=combined_qstats, hue='Barcode', x='Quality Score', y='Number of Reads')
+            ax_quality.set_title(
+                f"Read quality\nMean: {round(df_stats['mean_quality'].mean(), 1)} "
+                f"Median: {round(df_stats['mean_quality'].median())} "
             )
-            for series in plt_quality.series:
-                series.lineStyle = {'opacity': 0.8}
-                series.showSymbol = False
-            plt_quality.title = dict(
-                text="Read quality",
-                subtext=(
-                    f"Mean: {round(df_stats['mean_quality'].mean(), 1)} "
-                    f"Median: {round(df_stats['mean_quality'].median())} "
-                )
-            )
-            plt_quality.xAxis = {
-                'min': 0,
-                'max': 30,
-                'splitNumber': 6,
-            }
-            plt_quality.legend = dict(orient='horizontal', right='right', top=40, icon='rect')
-            EZChart(plt_quality, theme='epi2melabs', height='400px')
+            ax_quality.set_xlim(0, 30)
+            ax_quality.set_xticks(np.arange(0, 31, 5))
+            ax_quality.set_xlabel('Quality score')
+            ax_quality.set_ylabel('Number of reads')
+            ax_quality.legend(title='Barcode', bbox_to_anchor=(1.05, 1), loc='upper right')
+            plt.tight_layout()
+            EZChart(plt, theme='epi2melabs', height='400px')
 
-            # Line plot of read length
+# Line plot of read length
             df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
             df_length['binned_length'] = df_length['binned_length'].astype(str)
 
