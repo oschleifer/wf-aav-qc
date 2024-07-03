@@ -196,7 +196,7 @@ def plot_read_summary(report, stats):
             plt_quality.title = dict(
                 text="Read Quality",
                 subtext=(
-                    f"Mean: {round(df_stats['mean_quality'].mean(), .1)} "
+                    f"Mean: {round(df_stats['mean_quality'].mean(), 1)} "
                     f"Median: {round(df_stats['mean_quality'].median())} "
                 )
             )
