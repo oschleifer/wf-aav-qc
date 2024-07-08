@@ -180,7 +180,7 @@ def plot_quality(df_stats):
     EZChart(plt_quality, theme='epi2melabs', height='400px')
 
 def plot_length(df_stats):
-    """Plot the read lengths."""
+    """Helper function to plot the read lengths."""
     df_length = df_stats.groupby(['sample_name', 'binned_length']).size().reset_index(name='read_l_count')
     df_length['binned_length'] = df_length['binned_length'].astype(str)
     df_length['binned_length'] = df_length['binned_length'].apply(lambda x: float(x.split(",")[0][1:]))
@@ -218,7 +218,7 @@ def plot_length(df_stats):
     EZChart(plt_length, theme='epi2melabs', height='400px')
 
 def plot_yield(df_stats):
-    """Plot the base yield above read length."""
+    """Helper function to plot the base yield above read length."""
     combined_yield = pd.DataFrame()
     for sample_name, df_sample in df_stats.groupby('sample_name'):
         length = np.concatenate(([0], np.sort(df_sample["read_length"])), dtype="float")
