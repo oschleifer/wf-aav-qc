@@ -506,11 +506,11 @@ workflow pipeline {
             transgene_plasmid_name
         )
 
-        contamination(
-            map_to_combined_reference.out.bam_info
-            | join(samples.map {meta, fastq, stats -> [meta, stats]}),
-            ref_transgene_plasmid, ref_helper, ref_rep_cap, ref_host
-        )
+        // contamination(
+        //     map_to_combined_reference.out.bam_info
+        //     | join(samples.map {meta, fastq, stats -> [meta, stats]}),
+        //     ref_transgene_plasmid, ref_helper, ref_rep_cap, ref_host
+        // )
 
         aav_structures(
             map_to_combined_reference.out.bam_info,
@@ -542,7 +542,7 @@ workflow pipeline {
 
             truncations.out.locations.collectFile(keepHeader: true),
             itr_coverage.out.collectFile(keepHeader: true),
-            contamination.out.contam_class_counts.collectFile(keepHeader: true),
+            // contamination.out.contam_class_counts.collectFile(keepHeader: true),
             aav_structures.out.structure_counts.collectFile(keepHeader: true),
             software_versions.collect(),
             workflow_params
