@@ -507,9 +507,6 @@ workflow pipeline {
         )
 
         contamination(
-            // map_to_combined_reference.out.bam_info
-            // | join(samples.map {meta, fastq, stats -> [meta, stats]}),
-            // ref_transgene_plasmid, ref_helper, ref_rep_cap, ref_host
         )
 
         aav_structures(
