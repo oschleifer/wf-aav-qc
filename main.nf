@@ -406,7 +406,7 @@ process makeReport {
         path 'per_read_stats.tsv'
         path 'truncations.tsv'
         path 'itr_coverage.tsv'
-        // path 'contam_class_counts.tsv'
+        path 'contam_class_counts.tsv'
         path 'structure_counts.tsv'
         path "versions/*"
         path "params.json"
@@ -424,7 +424,7 @@ process makeReport {
         --metadata metadata.json \
         --truncations truncations.tsv \
         --itr_coverage itr_coverage.tsv \
-        // --contam_class_counts contam_class_counts.tsv \
+        --contam_class_counts contam_class_counts.tsv \
         --aav_structures structure_counts.tsv
     """
 }
@@ -506,11 +506,11 @@ workflow pipeline {
             transgene_plasmid_name
         )
 
-        // contamination(
-        //     map_to_combined_reference.out.bam_info
-        //     | join(samples.map {meta, fastq, stats -> [meta, stats]}),
-        //     ref_transgene_plasmid, ref_helper, ref_rep_cap, ref_host
-        // )
+        contamination(
+            map_to_combined_reference.out.bam_info
+            | join(samples.map {meta, fastq, stats -> [meta, stats]}),
+            ref_transgene_plasmid, ref_helper, ref_rep_cap, ref_host
+        )
 
         aav_structures(
             map_to_combined_reference.out.bam_info,
@@ -542,7 +542,7 @@ workflow pipeline {
 
             truncations.out.locations.collectFile(keepHeader: true),
             itr_coverage.out.collectFile(keepHeader: true),
-            // contamination.out.contam_class_counts.collectFile(keepHeader: true),
+            contamination.out.contam_class_counts.collectFile(keepHeader: true),
             aav_structures.out.structure_counts.collectFile(keepHeader: true),
             software_versions.collect(),
             workflow_params
