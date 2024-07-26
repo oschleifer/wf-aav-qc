@@ -82,7 +82,7 @@ def plot_itr_coverage(report, coverage_file):
                                 s.showSymbol = False
                             EZChart(plt, theme='epi2melabs', height='300px')
 
-
+def plot_contamination(): return
 def plot_contamination(report, class_counts):
     """Make report section with contamination plots.
 
@@ -341,9 +341,10 @@ def main(args):
         #     # TODO fix this. Do we need o concat stats?
         #     fastcat.SeqSummary(args.stats[0])
 
-    # plot_contamination(
-    #     report,
-    #     args.contam_class_counts)
+    plot_contamination(
+        # report,
+        # args.contam_class_counts
+        )
     plot_trucations(report, args.truncations)
     plot_itr_coverage(report, args.itr_coverage)
     plot_aav_structures(report, args.aav_structures)
@@ -373,8 +374,8 @@ def argparser():
         "--truncations", help="TSV with start and end columns for.")
     parser.add_argument(
         "--itr_coverage", help="TSV with alignment Pos and EndPos columns.")
-    # parser.add_argument(
-    #     "--contam_class_counts", help="TSV of reference mapping counts.")
+    parser.add_argument(
+        "--contam_class_counts", help="TSV of reference mapping counts.")
     parser.add_argument(
         "--aav_structures", help="TSV of reads with AAV structure assignment.")
     parser.add_argument(
