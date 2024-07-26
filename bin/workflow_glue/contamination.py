@@ -41,7 +41,7 @@ def argparser():
 
     return parser
 
-
+def main(): return
 def main(args):
     """Run main entry point."""
     # Extract the reference sequence names from the FATA files,
