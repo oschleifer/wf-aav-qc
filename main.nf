@@ -409,7 +409,6 @@ process makeReport {
         --metadata metadata.json \
         --truncations truncations.tsv \
         --itr_coverage itr_coverage.tsv \
-        // --contam_class_counts contam_class_counts.tsv \
         --aav_structures structure_counts.tsv
     """
 }
