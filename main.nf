@@ -219,16 +219,16 @@ process contamination {
     cpus 2
     memory '4 GB'
     input:
-        tuple val(meta),
-              path("bam_info.tsv"),
-              path('read_stats/')
-        path('transgene.fa')
-        path('helper.fa')
-        path('rep_cap.fa')
-        path('host_cell_line.fa')
+        // tuple val(meta),
+        //       path("bam_info.tsv"),
+        //       path('read_stats/')
+        // path('transgene.fa')
+        // path('helper.fa')
+        // path('rep_cap.fa')
+        // path('host_cell_line.fa')
 
     output:
-        path('contam_class_counts.tsv'), emit: contam_class_counts
+        // path('contam_class_counts.tsv'), emit: contam_class_counts
 
     """
     # Get read IDs from either bamstats or fastcat stats file.
@@ -539,7 +539,7 @@ workflow pipeline {
 
             truncations.out.locations.collectFile(keepHeader: true),
             itr_coverage.out.collectFile(keepHeader: true),
-            contamination.out.contam_class_counts.collectFile(keepHeader: true),
+            // contamination.out.contam_class_counts.collectFile(keepHeader: true),
             aav_structures.out.structure_counts.collectFile(keepHeader: true),
             software_versions.collect(),
             workflow_params
