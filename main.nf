@@ -211,25 +211,25 @@ process truncations {
 }
 
 
-process contamination {
-    /*
-    Make plot data detailing the frequency of reads mapping to various references.
-    */
-    label "wf_aav"
-    cpus 2
-    memory '4 GB'
-    input:
-        // tuple val(meta),
-        //       path("bam_info.tsv"),
-        //       path('read_stats/')
-        // path('transgene.fa')
-        // path('helper.fa')
-        // path('rep_cap.fa')
-        // path('host_cell_line.fa')
+// process contamination {
+//     /*
+//     Make plot data detailing the frequency of reads mapping to various references.
+//     */
+//     label "wf_aav"
+//     cpus 2
+//     memory '4 GB'
+//     input:
+//         tuple val(meta),
+//               path("bam_info.tsv"),
+//               path('read_stats/')
+//         path('transgene.fa')
+//         path('helper.fa')
+//         path('rep_cap.fa')
+//         path('host_cell_line.fa')
 
-    output:
-        // path('contam_class_counts.tsv'), emit: contam_class_counts
-}
+//     output:
+//         path('contam_class_counts.tsv'), emit: contam_class_counts
+// }
 
 
 process aav_structures {
@@ -491,8 +491,8 @@ workflow pipeline {
             transgene_plasmid_name
         )
 
-        contamination(
-        )
+        // contamination(
+        // )
 
         aav_structures(
             map_to_combined_reference.out.bam_info,
