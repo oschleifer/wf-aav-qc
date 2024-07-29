@@ -406,7 +406,7 @@ process makeReport {
         path 'per_read_stats.tsv'
         path 'truncations.tsv'
         path 'itr_coverage.tsv'
-        path 'contam_class_counts.tsv'
+        // path 'contam_class_counts.tsv'
         path 'structure_counts.tsv'
         path "versions/*"
         path "params.json"
@@ -424,7 +424,7 @@ process makeReport {
         --metadata metadata.json \
         --truncations truncations.tsv \
         --itr_coverage itr_coverage.tsv \
-        --contam_class_counts contam_class_counts.tsv \
+        // --contam_class_counts contam_class_counts.tsv \
         --aav_structures structure_counts.tsv
     """
 }
