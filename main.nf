@@ -229,21 +229,6 @@ process contamination {
 
     output:
         // path('contam_class_counts.tsv'), emit: contam_class_counts
-
-    """
-    # Get read IDs from either bamstats or fastcat stats file.
-    zcat < read_stats/*/*stats.tsv.gz | cut -f1 | tail -n +2 > read_ids.tsv
-
-    // workflow-glue contamination \
-    //     --bam_info bam_info.tsv \
-    //     --sample_id "$meta.alias" \
-    //     --transgene_fasta transgene.fa \
-    //     --helper_fasta helper.fa \
-    //     --rep_cap_fasta rep_cap.fa \
-    //     --host_fasta  host_cell_line.fa \
-    //     --read_ids read_ids.tsv \
-    //     --contam_class_counts contam_class_counts.tsv
-    """
 }
 
 
