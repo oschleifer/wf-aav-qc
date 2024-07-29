@@ -313,56 +313,56 @@ process lookup_medaka_variant_model {
 }
 
 
-process medaka_consensus {
-    /*
-    Generate a consensus sequence and a VCF with the variant sites from alignments mapping to the transgene plasmid.
-    */
-    label "medaka"
-    cpus 4
-    memory '2 GB'
-    input:
-        tuple val(meta),
-              path("align.bam"),
-              path("align.bam.bai")
-        val(medaka_model)
-        path('transgene_plasmid.fa')
-        val(transgene_plasmid_name)
+// process medaka_consensus {
+//     /*
+//     Generate a consensus sequence and a VCF with the variant sites from alignments mapping to the transgene plasmid.
+//     */
+//     label "medaka"
+//     cpus 4
+//     memory '2 GB'
+//     input:
+//         tuple val(meta),
+//               path("align.bam"),
+//               path("align.bam.bai")
+//         val(medaka_model)
+//         path('transgene_plasmid.fa')
+//         val(transgene_plasmid_name)
 
-    output:
-        tuple val(meta),
-              path("${meta.alias}.transgene_plasmsid_consensus.fasta.gz"),
-              emit: consensus
-       tuple val(meta),
-              path("${meta.alias}.transgene_plasmsid_sorted.vcf.gz"),
-              emit: variants
-    script:
-        def model = medaka_model
-    """
-    # Extract reads mapping to transgene plasmid
-    samtools view align.bam -bh "${transgene_plasmid_name}" > transgene_reads.bam
-    samtools index transgene_reads.bam
+//     output:
+//         tuple val(meta),
+//               path("${meta.alias}.transgene_plasmsid_consensus.fasta.gz"),
+//               emit: consensus
+//        tuple val(meta),
+//               path("${meta.alias}.transgene_plasmsid_sorted.vcf.gz"),
+//               emit: variants
+//     script:
+//         def model = medaka_model
+//     """
+//     # Extract reads mapping to transgene plasmid
+//     samtools view align.bam -bh "${transgene_plasmid_name}" > transgene_reads.bam
+//     samtools index transgene_reads.bam
 
-    echo ${model}
-    echo ${medaka_model}
+//     echo ${model}
+//     echo ${medaka_model}
 
-    medaka consensus transgene_reads.bam "consensus_probs.hdf" \
-        --threads 2 --model ${model}
+//     medaka consensus transgene_reads.bam "consensus_probs.hdf" \
+//         --threads 2 --model ${model}
 
-    medaka stitch \
-        --threads 2 \
-         consensus_probs.hdf \
-         transgene_plasmid.fa \
-         "${meta.alias}.transgene_plasmsid_consensus.fasta"
-    bgzip "${meta.alias}.transgene_plasmsid_consensus.fasta"
+//     medaka stitch \
+//         --threads 2 \
+//          consensus_probs.hdf \
+//          transgene_plasmid.fa \
+//          "${meta.alias}.transgene_plasmsid_consensus.fasta"
+//     bgzip "${meta.alias}.transgene_plasmsid_consensus.fasta"
 
-    medaka variant \
-         transgene_plasmid.fa \
-         consensus_probs.hdf \
-         "transgene_plasmid.vcf"
+//     medaka variant \
+//          transgene_plasmid.fa \
+//          consensus_probs.hdf \
+//          "transgene_plasmid.vcf"
 
-   bcftools sort transgene_plasmid.vcf > "${meta.alias}.transgene_plasmsid_sorted.vcf.gz"
-    """
-}
+//    bcftools sort transgene_plasmid.vcf > "${meta.alias}.transgene_plasmsid_sorted.vcf.gz"
+//     """
+// }
 
 
 process combine_stats {
@@ -508,12 +508,12 @@ workflow pipeline {
             medaka_model = lookup_medaka_variant_model(lookup_table, params.basecaller_cfg)
        }
 
-        medaka_consensus(
-            map_to_combined_reference.out.bam,
-            medaka_model,
-            ref_transgene_plasmid,
-            transgene_plasmid_name
-        )
+        // medaka_consensus(
+        //     map_to_combined_reference.out.bam,
+        //     medaka_model,
+        //     ref_transgene_plasmid,
+        //     transgene_plasmid_name
+        // )
 
         report = makeReport(
             metadata,
@@ -537,8 +537,8 @@ workflow pipeline {
         bam = map_to_combined_reference.out.bam
         bam_info = map_to_combined_reference.out.bam_info
         combined_reference = make_combined_reference.out.combined_reference
-        consensus = medaka_consensus.out.consensus
-        variants = medaka_consensus.out.variants
+        // consensus = medaka_consensus.out.consensus
+        // variants = medaka_consensus.out.variants
         per_read_genome_types = aav_structures.out.per_read_info
 }
 
@@ -596,12 +596,12 @@ workflow {
             return bam_and_indxs
         },
         pipeline.out.bam_info.map {meta, item -> [item, meta.alias]},
-        pipeline.out.consensus
-            | concat(
-                pipeline.out.variants,
-                pipeline.out.per_read_genome_types
-            )
-            | map {[it[1], it[0].alias]},
+        // pipeline.out.consensus
+        //     | concat(
+        //         pipeline.out.variants,
+        //         pipeline.out.per_read_genome_types
+        //     )
+        //     | map {[it[1], it[0].alias]},
         pipeline.out.combined_reference
             | map {[it, null]}
     )
