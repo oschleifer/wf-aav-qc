@@ -338,9 +338,9 @@ def main(args):
 
     if args.stats:
         plot_read_summary(report, args.stats[0])
-        with report.add_section("Read summary", "Read summary"):
+        # with report.add_section("Read summary", "Read summary"):
             # TODO fix this. Do we need o concat stats?
-            fastcat.SeqSummary(args.stats[0])
+            # fastcat.SeqSummary(args.stats[0])
 
     plot_contamination(
         report,
