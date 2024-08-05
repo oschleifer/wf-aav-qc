@@ -3,6 +3,7 @@ import json
 
 from dominate.tags import p
 import ezcharts as ezc
+from ezcharts.components import fastcat
 from ezcharts.components.ezchart import EZChart
 from ezcharts.components.reports import labs
 from ezcharts.layout.snippets import Grid, Tabs
