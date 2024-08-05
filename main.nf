@@ -211,25 +211,38 @@ process truncations {
 }
 
 
-// process contamination {
-//     /*
-//     Make plot data detailing the frequency of reads mapping to various references.
-//     */
-//     label "wf_aav"
-//     cpus 2
-//     memory '4 GB'
-//     input:
-//         tuple val(meta),
-//               path("bam_info.tsv"),
-//               path('read_stats/')
-//         path('transgene.fa')
-//         path('helper.fa')
-//         path('rep_cap.fa')
-//         path('host_cell_line.fa')
+process contamination {
+    /*
+    Make plot data detailing the frequency of reads mapping to various references.
+    */
+    label "wf_aav"
+    cpus 2
+    memory '4 GB'
+    input:
+        tuple val(meta),
+              path("bam_info.tsv"),
+              path('read_stats/')
+        path('transgene.fa')
+        path('helper.fa')
+        path('rep_cap.fa')
+        path('host_cell_line.fa')
 
-//     output:
-//         path('contam_class_counts.tsv'), emit: contam_class_counts
-// }
+    output:
+        path('contam_class_counts.tsv'), emit: contam_class_counts
+    script:
+        def n_reads = meta['n_seqs']
+    """
+    workflow-glue contamination \
+        --bam_info bam_info.tsv \
+        --sample_id "$meta.alias" \
+        --transgene_fasta transgene.fa \
+        --helper_fasta helper.fa \
+        --rep_cap_fasta rep_cap.fa \
+        --host_fasta  host_cell_line.fa \
+        --n_reads $n_reads \
+        --contam_class_counts contam_class_counts.tsv
+    """
+}
 
 
 process aav_structures {
@@ -313,56 +326,56 @@ process lookup_medaka_variant_model {
 }
 
 
-// process medaka_consensus {
-//     /*
-//     Generate a consensus sequence and a VCF with the variant sites from alignments mapping to the transgene plasmid.
-//     */
-//     label "medaka"
-//     cpus 4
-//     memory '2 GB'
-//     input:
-//         tuple val(meta),
-//               path("align.bam"),
-//               path("align.bam.bai")
-//         val(medaka_model)
-//         path('transgene_plasmid.fa')
-//         val(transgene_plasmid_name)
+process medaka_consensus {
+    /*
+    Generate a consensus sequence and a VCF with the variant sites from alignments mapping to the transgene plasmid.
+    */
+    label "medaka"
+    cpus 4
+    memory '2 GB'
+    input:
+        tuple val(meta),
+              path("align.bam"),
+              path("align.bam.bai")
+        val(medaka_model)
+        path('transgene_plasmid.fa')
+        val(transgene_plasmid_name)
 
-//     output:
-//         tuple val(meta),
-//               path("${meta.alias}.transgene_plasmsid_consensus.fasta.gz"),
-//               emit: consensus
-//        tuple val(meta),
-//               path("${meta.alias}.transgene_plasmsid_sorted.vcf.gz"),
-//               emit: variants
-//     script:
-//         def model = medaka_model
-//     """
-//     # Extract reads mapping to transgene plasmid
-//     samtools view align.bam -bh "${transgene_plasmid_name}" > transgene_reads.bam
-//     samtools index transgene_reads.bam
+    output:
+        tuple val(meta),
+              path("${meta.alias}.transgene_plasmsid_consensus.fasta.gz"),
+              emit: consensus
+       tuple val(meta),
+              path("${meta.alias}.transgene_plasmsid_sorted.vcf.gz"),
+              emit: variants
+    script:
+        def model = medaka_model
+    """
+    # Extract reads mapping to transgene plasmid
+    samtools view align.bam -bh "${transgene_plasmid_name}" > transgene_reads.bam
+    samtools index transgene_reads.bam
 
-//     echo ${model}
-//     echo ${medaka_model}
+    echo ${model}
+    echo ${medaka_model}
 
-//     medaka consensus transgene_reads.bam "consensus_probs.hdf" \
-//         --threads 2 --model ${model}
+    medaka consensus transgene_reads.bam "consensus_probs.hdf" \
+        --threads 2 --model ${model}
 
-//     medaka stitch \
-//         --threads 2 \
-//          consensus_probs.hdf \
-//          transgene_plasmid.fa \
-//          "${meta.alias}.transgene_plasmsid_consensus.fasta"
-//     bgzip "${meta.alias}.transgene_plasmsid_consensus.fasta"
+    medaka stitch \
+        --threads 2 \
+         consensus_probs.hdf \
+         transgene_plasmid.fa \
+         "${meta.alias}.transgene_plasmsid_consensus.fasta"
+    bgzip "${meta.alias}.transgene_plasmsid_consensus.fasta"
 
-//     medaka variant \
-//          transgene_plasmid.fa \
-//          consensus_probs.hdf \
-//          "transgene_plasmid.vcf"
+    medaka variant \
+         transgene_plasmid.fa \
+         consensus_probs.hdf \
+         "transgene_plasmid.vcf"
 
-//    bcftools sort transgene_plasmid.vcf > "${meta.alias}.transgene_plasmsid_sorted.vcf.gz"
-//     """
-// }
+   bcftools sort transgene_plasmid.vcf > "${meta.alias}.transgene_plasmsid_sorted.vcf.gz"
+    """
+}
 
 
 process combine_stats {
@@ -391,7 +404,7 @@ process makeReport {
         path 'per_read_stats.tsv'
         path 'truncations.tsv'
         path 'itr_coverage.tsv'
-        // path 'contam_class_counts.tsv'
+        path 'contam_class_counts.tsv'
         path 'structure_counts.tsv'
         path "versions/*"
         path "params.json"
@@ -490,8 +503,11 @@ workflow pipeline {
             transgene_plasmid_name
         )
 
-        // contamination(
-        // )
+        contamination(
+            map_to_combined_reference.out.bam_info
+            | join(samples.map {meta, fastq, stats -> [meta, stats]}),
+            ref_transgene_plasmid, ref_helper, ref_rep_cap, ref_host
+        )
 
         aav_structures(
             map_to_combined_reference.out.bam_info,
@@ -508,12 +524,12 @@ workflow pipeline {
             medaka_model = lookup_medaka_variant_model(lookup_table, params.basecaller_cfg)
        }
 
-        // medaka_consensus(
-        //     map_to_combined_reference.out.bam,
-        //     medaka_model,
-        //     ref_transgene_plasmid,
-        //     transgene_plasmid_name
-        // )
+        medaka_consensus(
+            map_to_combined_reference.out.bam,
+            medaka_model,
+            ref_transgene_plasmid,
+            transgene_plasmid_name
+        )
 
         report = makeReport(
             metadata,
@@ -523,7 +539,7 @@ workflow pipeline {
 
             truncations.out.locations.collectFile(keepHeader: true),
             itr_coverage.out.collectFile(keepHeader: true),
-            // contamination.out.contam_class_counts.collectFile(keepHeader: true),
+            contamination.out.contam_class_counts.collectFile(keepHeader: true),
             aav_structures.out.structure_counts.collectFile(keepHeader: true),
             software_versions.collect(),
             workflow_params
@@ -537,8 +553,8 @@ workflow pipeline {
         bam = map_to_combined_reference.out.bam
         bam_info = map_to_combined_reference.out.bam_info
         combined_reference = make_combined_reference.out.combined_reference
-        // consensus = medaka_consensus.out.consensus
-        // variants = medaka_consensus.out.variants
+        consensus = medaka_consensus.out.consensus
+        variants = medaka_consensus.out.variants
         per_read_genome_types = aav_structures.out.per_read_info
 }
 
@@ -596,12 +612,12 @@ workflow {
             return bam_and_indxs
         },
         pipeline.out.bam_info.map {meta, item -> [item, meta.alias]},
-        // pipeline.out.consensus
-        //     | concat(
-        //         pipeline.out.variants,
-        //         pipeline.out.per_read_genome_types
-        //     )
-        //     | map {[it[1], it[0].alias]},
+        pipeline.out.consensus
+            | concat(
+                pipeline.out.variants,
+                pipeline.out.per_read_genome_types
+            )
+            | map {[it[1], it[0].alias]},
         pipeline.out.combined_reference
             | map {[it, null]}
     )
