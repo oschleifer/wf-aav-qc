@@ -229,8 +229,7 @@ process contamination {
 
     output:
         path('contam_class_counts.tsv'), emit: contam_class_counts
-    script:
-        def n_reads = meta['n_seqs']
+
     """
     workflow-glue contamination \
         --bam_info bam_info.tsv \
@@ -239,7 +238,7 @@ process contamination {
         --helper_fasta helper.fa \
         --rep_cap_fasta rep_cap.fa \
         --host_fasta  host_cell_line.fa \
-        --n_reads $n_reads \
+        --read_id read_ids.tsv \
         --contam_class_counts contam_class_counts.tsv
     """
 }
@@ -422,6 +421,7 @@ process makeReport {
         --metadata metadata.json \
         --truncations truncations.tsv \
         --itr_coverage itr_coverage.tsv \
+        --contam_class_counts contam_class_counts.tsv \
         --aav_structures structure_counts.tsv
     """
 }
