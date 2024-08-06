@@ -114,36 +114,58 @@ def plot_contamination(report, class_counts):
             "plasmid)."
         )
 
-        with Grid(columns=2):
-            # Prepare data for combined plots
-            df_reads = df_class_counts[df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
-            df_reads['Percentage of Reads'] = df_reads['Percentage of alignments']
+        tabs = Tabs()
+        with tabs.add_dropdown_menu():
 
-            df_alns = df_class_counts[~df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
+            for sample, df_sample in df_class_counts.groupby('sample_id'):
+                with tabs.add_dropdown_tab(sample):
+                    with Grid(columns=2):
+                        df_reads = df_sample[
+                            df_sample.Reference.isin(['Mapped', 'Unmapped'])]
+                        df_reads = df_reads.rename(columns={
+                            'Percentage of alignments': 'Percentage of Reads'})
+                        plt = ezc.barplot(
+                            df_reads[['Reference', 'Percentage of Reads']])
+                        plt.title = dict(text='Reads mapped/unmapped')
+                        EZChart(plt, theme='epi2melabs', height='400px')
 
-            # Sort the DataFrame by 'Reference' to have 'Unmapped' first and then 'Mapped'
-            df_reads['Reference'] = pd.Categorical(df_reads['Reference'], categories=['Unmapped', 'Mapped'], ordered=True)
-            df_reads = df_reads.sort_values(by='Reference')
+                        df_alns = df_sample[
+                            ~df_sample.Reference.isin(['Mapped', 'Unmapped'])]
+                        plt = ezc.barplot(
+                            df_alns[['Reference', 'Percentage of alignments']])
+                        plt.title = dict(text='Alignment counts per target')
+                        EZChart(plt, theme='epi2melabs', height='400px')
 
-            # Create the first plot: Reads mapped/unmapped
-            plt_reads = ezc.barplot(
-                df_reads, width=1,
-                x='Reference', y='Percentage of Reads',
-                hue='sample_id', group='Reference'
-            )
-            plt_reads.title = dict(text='Reads mapped/unmapped')
-            plt_reads.xAxis.axisLabel = dict(rotate=45)
-            EZChart(plt_reads, theme='epi2melabs', height='400px')
+        # with Grid(columns=2):
+            # # Prepare data for combined plots
+            # df_reads = df_class_counts[df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
+            # df_reads['Percentage of Reads'] = df_reads['Percentage of alignments']
 
-            # Create the second plot: Alignment counts per target
-            plt_alns = ezc.barplot(
-                df_alns, width=1,
-                x='Reference', y='Percentage of alignments',
-                hue='sample_id', group='Reference'
-            )
-            plt_alns.title = dict(text='Alignment counts per target')
-            plt_alns.xAxis.axisLabel = dict(rotate=45)
-            EZChart(plt_alns, theme='epi2melabs', height='400px')
+            # df_alns = df_class_counts[~df_class_counts.Reference.isin(['Mapped', 'Unmapped'])].copy()
+
+            # # Sort the DataFrame by 'Reference' to have 'Unmapped' first and then 'Mapped'
+            # df_reads['Reference'] = pd.Categorical(df_reads['Reference'], categories=['Unmapped', 'Mapped'], ordered=True)
+            # df_reads = df_reads.sort_values(by='Reference')
+
+            # # Create the first plot: Reads mapped/unmapped
+            # plt_reads = ezc.barplot(
+            #     df_reads, width=1,
+            #     x='Reference', y='Percentage of Reads',
+            #     hue='sample_id', group='Reference'
+            # )
+            # plt_reads.title = dict(text='Reads mapped/unmapped')
+            # plt_reads.xAxis.axisLabel = dict(rotate=45)
+            # EZChart(plt_reads, theme='epi2melabs', height='400px')
+
+            # # Create the second plot: Alignment counts per target
+            # plt_alns = ezc.barplot(
+            #     df_alns, width=1,
+            #     x='Reference', y='Percentage of alignments',
+            #     hue='sample_id', group='Reference'
+            # )
+            # plt_alns.title = dict(text='Alignment counts per target')
+            # plt_alns.xAxis.axisLabel = dict(rotate=45)
+            # EZChart(plt_alns, theme='epi2melabs', height='400px')
 
 def plot_quality(df_stats):
     """Helper function to plot the quality scores."""
