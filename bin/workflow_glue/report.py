@@ -83,7 +83,6 @@ def plot_itr_coverage(report, coverage_file):
                                 s.showSymbol = False
                             EZChart(plt, theme='epi2melabs', height='300px')
 
-def plot_contamination(): return
 def plot_contamination(report, class_counts):
     """Make report section with contamination plots.
 
